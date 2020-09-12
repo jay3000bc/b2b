@@ -28,7 +28,7 @@
                     <v-btn to="/add-product" class="text-center"><v-list-item-title>Add Products</v-list-item-title></v-btn>
                     <v-btn to="/list-product" class="text-center"><v-list-item-title>List Products</v-list-item-title></v-btn>
                     <v-btn><v-list-item-title to="/profile">Quick Product Upload</v-list-item-title></v-btn>
-                    <v-btn><v-list-item-title to="/profile">Image Gallery</v-list-item-title></v-btn>
+                    <v-btn to="/image-gallery" class="text-center"><v-list-item-title>Image Gallery</v-list-item-title></v-btn>
                     <v-btn><v-list-item-title to="/profile">Retailers</v-list-item-title></v-btn>
                     <v-btn><v-list-item-title to="/profile">Help &amp; Support</v-list-item-title></v-btn>
                     <v-btn><v-list-item-title @click="logout" >Logout</v-list-item-title></v-btn>

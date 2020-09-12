@@ -7,6 +7,9 @@ import Preferences from '../views/Preferences.vue'
 import Dashboard from '../views/dashboard.vue'
 import AddProduct from '../views/AddProduct.vue'
 import ListProduct from '../views/ListProduct.vue'
+import ImageGallary from '../views/ImageGallery.vue'
+import SingleProduct from '../views/SingleProduct.vue'
+
 
 
 Vue.use(VueRouter)
@@ -42,7 +45,15 @@ Vue.use(VueRouter)
     },
   },
   {
-    path: '/add-product/:id',
+    path: '/add-product',
+    name: 'AddProduct',
+    component: AddProduct,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/update-product/:id',
     name: 'AddProduct',
     component: AddProduct,
     meta: { 
@@ -56,13 +67,29 @@ Vue.use(VueRouter)
     meta: { 
       requiresAuth: true
     },
-  }
+  },
+  {
+    path: '/image-gallery',
+    name: 'ImageGallary',
+    component: ImageGallary,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/product-details/:id',
+    name: 'SingleProduct',
+    component: SingleProduct,
+    meta: { 
+      requiresAuth: true
+    },
+  },
 ]
 
 const router = new VueRouter({
   mode: 'history',
-  //base: process.env.BASE_URL,
-  base: '/mukesh/b2b/',
+  base: process.env.BASE_URL,
+  //base: '/mukesh/b2b/',
   routes
 })
 

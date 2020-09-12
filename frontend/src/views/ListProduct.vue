@@ -62,7 +62,7 @@
                                                 class="mt-2"
                                                 ></v-select>
                                         </td>
-                                        <td><v-btn small class="mr-2">View</v-btn><v-btn small :to="{ name: 'AddProduct', params: { id: item.id }}">Edit</v-btn></td>
+                                        <td><v-btn :to="{ name: 'SingleProduct', params: { id: item.id }}" small class="mr-2">View</v-btn><v-btn small :to="{ name: 'AddProduct', params: { id: item.id }}">Edit</v-btn></td>
                                     </tr>
                                 </tbody>
                             </template>

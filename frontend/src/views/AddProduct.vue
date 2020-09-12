@@ -36,15 +36,6 @@
                     v-on:keyup.enter="sub_category_change"
                     ></v-autocomplete>
                     <v-text-field
-                        v-if="product_code_preference == 'yes'"
-                        :disabled="product_code_disabled"
-                        outlined
-                        ref="product_code"
-                        v-model="product_code"
-                        label="Product Code"
-                        placeholder="Product Code"
-                    ></v-text-field>
-                    <v-text-field
                         outlined
                         ref="product_name"
                         v-model="product_name"
@@ -77,7 +68,7 @@
                     <v-btn  color="primary" text class="float-right pb-3">Add From Gallary</v-btn>
                     <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" @vdropzone-complete="afterComplete"></vue-dropzone>
                     <v-row class="mt-4" v-for="(product, index) in products" v-bind:key="index">
-                        <v-col sm="2">
+                        <v-col :sm="unit_inputbox_length">
                             <v-text-field
                                 outlined
                                 ref="unit"
@@ -88,6 +79,16 @@
                             ></v-text-field>
                         </v-col>
                         <v-col sm="2">
+                           <v-text-field
+                              v-if="product_code_preference == 'yes'"
+                              outlined
+                              ref="code"
+                              v-model="product.code"
+                              label="Pr.Code"
+                              placeholder="Product Code"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col sm="1">
                             <v-text-field
                                v-if="product_mrp_preference == 'yes'"
                                 outlined
@@ -97,7 +98,7 @@
                                 placeholder="MRP"
                             ></v-text-field>
                         </v-col>
-                        <v-col sm="2">
+                        <v-col sm="1">
                             <v-text-field
                                 v-if="product_rate_preference == 'yes'"
                                 outlined
@@ -174,6 +175,7 @@ export default {
     },
     data () {
       return {
+        unit_inputbox_length: 2,
         title: 'Add Product',
         product_code_disabled: false,
         save_btn: true,
@@ -195,9 +197,9 @@ export default {
         dropzoneOptions: {
             url: 'https://httpbin.org/post',
             maxFiles: 5,
-            maxFilesize: 2,
+            maxFilesize: 5,
             addRemoveLinks: true,
-            acceptedFiles: ".jpeg,.jpg,.png,",
+            acceptedFiles: ".jpeg,.jpg,.png,.gif,.bmp",
             uploadMultiple: false
         },
         options_yes_no: ['yes', 'no'],
@@ -205,6 +207,7 @@ export default {
         sub_category_input_val: null,
         product: {
           unit: '',
+          code: '',
           mrp: '',
           rate: '',
           moq: 1,
@@ -237,7 +240,6 @@ export default {
           let data = {
               category: this.product_category,
               sub_category: this.product_sub_category,
-              code: this.product_code,
               name: this.product_name,
               description: this.product_description,
               tax: this.tax,
@@ -246,6 +248,7 @@ export default {
           }
           this.$store.dispatch('saveProduct', data)
           .then(() => {
+            this.valid = false;
             //console.log(res)
             this.$swal({
                 icon: 'success',
@@ -266,7 +269,6 @@ export default {
           let data = {
               category: this.product_category,
               sub_category: this.product_sub_category,
-              code: this.product_code,
               name: this.product_name,
               description: this.product_description,
               tax: this.tax,
@@ -305,6 +307,7 @@ export default {
         addNewProductUnit() {
           this.products.push({
             unit: '',
+            code:'',
             mrp: '',
             rate: '',
             moq: 1,
@@ -356,7 +359,6 @@ export default {
                 console.log(res.data.data)
                 this.product_category = res.data.data[0].category,
                 this.product_sub_category = res.data.data[0].sub_category,
-                this.product_code = res.data.data[0].code,
                 this.product_name = res.data.data[0].name,
                 this.product_description = res.data.data[0].description,
                 this.tax  = res.data.data[0].tax
@@ -369,6 +371,7 @@ export default {
                 for (let i = 0; i < res.data.data[0].units.length; i++) {
                   this.products.push({
                     unit: res.data.data[0].units[i].units,
+                    code: res.data.data[0].units[i].code,
                     mrp: res.data.data[0].units[i].mrp,
                     rate: res.data.data[0].units[i].rate,
                     moq: res.data.data[0].units[i].moq,
