@@ -145,7 +145,7 @@
                 </v-card-text>
                 <v-divider class="mt-12"></v-divider>
                 <v-card-actions>
-                  <v-btn text>Cancel</v-btn>
+                  <v-btn text @click="previewProduct">Preview</v-btn>
                   <v-spacer></v-spacer>
                   <v-btn  color="primary" v-show="save_btn" text :disabled="!valid"  @click="validate">Save</v-btn>
                   <v-btn  color="primary" v-show="update_btn" text :disabled="!valid"  @click="validate">Update</v-btn>
@@ -235,6 +235,32 @@ export default {
             else
               this.saveProduct()
           }
+        },
+        previewProduct() {
+          let data = {
+              category: this.product_category,
+              sub_category: this.product_sub_category,
+              name: this.product_name,
+              description: this.product_description,
+              tax: this.tax,
+              product: this.products,
+              product_images: this.product_images,
+          }
+          this.$store.dispatch('previewProduct', data)
+          .then((res) => {
+            this.valid = false;
+            //console.log(res.data.data.id)
+            this.$router.push('/preview/'+ res.data.data.id)
+            
+          })
+          .catch(err => {
+            // console.log(err)
+            this.$swal({
+                icon: 'error',
+                title: 'Oops...',
+                text: err,
+            });
+          })
         },
         saveProduct() {
           let data = {

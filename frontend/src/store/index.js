@@ -187,6 +187,35 @@ export default new Vuex.Store({
         })
       })
     },
+    previewProduct({commit}, data) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}previewProducts`, data: data, method: 'POST' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          localStorage.removeItem('token')
+          reject(err)
+        })
+      })
+    },
+    previewProductDetails({commit}, id) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}previewProductsDetails/${id}`, method: 'GET' })
+        .then(resp => {
+          //console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
     saveProduct({commit}, data) {
       return new Promise((resolve, reject) => {
         commit('auth_request')
@@ -236,7 +265,7 @@ export default new Vuex.Store({
         commit('auth_request')
         axios({url: `${process.env.VUE_APP_APIURL}products`, method: 'GET' })
         .then(resp => {
-          console.log(resp)
+          //console.log(resp)
           resolve(resp)
         })
         .catch(err => {
@@ -265,6 +294,34 @@ export default new Vuex.Store({
         axios({url: `${process.env.VUE_APP_APIURL}getImages`, method: 'GET' })
         .then(resp => {
           //console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    updateProductAvalibility({commit}, data) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}updateProductAvalibility`, data:data, method: 'POST' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    updateProductStatus({commit}, data) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}updateProductStatus`, data:data, method: 'POST' })
+        .then(resp => {
+          console.log(resp)
           resolve(resp)
         })
         .catch(err => {

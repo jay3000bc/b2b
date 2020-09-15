@@ -31,9 +31,7 @@
                                         <td>{{ item.code }}</td>
                                         <td>{{ item.name }}</td>
                                         <td>
-                                            <span class="mr-2"  v-for="unit in item.units" :key="unit.id">
-                                                {{unit.units}} @ {{unit.rate}} <br>
-                                            </span>
+                                          {{ item.rate }}
                                         </td>
                                         <td>
                                             <span class="mr-2"  v-for="photo in item.photos" :key="photo.photo_name">
@@ -43,9 +41,10 @@
                                          <td>
                                              <v-select 
                                                 style="width: 100px;"
-                                                v-model="availability"
                                                 :items="options_yes_no"
                                                 label="Select"
+                                                :value="item.available"
+                                                @change="change_available($event, item.unit_id)"
                                                 dense
                                                 solo
                                                 class="mt-2"
@@ -54,8 +53,9 @@
                                         <td>
                                             <v-select
                                                 style="width: 100px;"
-                                                v-model="status"
+                                                :value="item.status"
                                                 :items="options_active_inactive"
+                                                 @change="change_status($event, item.unit_id)"
                                                 label="Select"
                                                 dense
                                                 solo  
@@ -110,15 +110,50 @@ export default {
         
     },
     methods: {
-        validate() {
-            
-        }
+      change_available(e, unit_id) {
+        console.log(e, unit_id);
+        let data = {
+          unit_id: unit_id,
+          availability: e
+        } 
+        this.$store.dispatch('updateProductAvalibility', data)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch(err => {
+          // console.log(err)
+          this.$swal({
+              icon: 'error',
+              title: 'Oops...',
+              text: err,
+          });
+        })
+      },
+      change_status(e, unit_id) {
+        console.log(e, unit_id);
+        let data = {
+          unit_id: unit_id,
+          status: e
+        } 
+        this.$store.dispatch('updateProductStatus', data)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch(err => {
+          // console.log(err)
+          this.$swal({
+              icon: 'error',
+              title: 'Oops...',
+              text: err,
+          });
+        })
+      },
     },
     created() {
-        this.$store.dispatch('getProducts')
-      .then((res) => {
+      this.$store.dispatch('getProducts')
+        .then((res) => {
+        console.log(res.data.data);
         this.products = res.data.data
-        
       })
       .catch(err => {
           console.log(err)

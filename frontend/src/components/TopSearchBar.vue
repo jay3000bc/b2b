@@ -22,6 +22,7 @@
                 :key="item.title"
             >
                 <v-list-item-content>
+                    <v-btn to="/my-shop" class="text-center"><v-list-item-title >My Shop</v-list-item-title></v-btn>
                     <v-btn to="/profile" class="text-center"><v-list-item-title >Profile</v-list-item-title></v-btn>
                     <v-btn><v-list-item-title to="/profile">Change Password</v-list-item-title></v-btn>
                     <v-btn to="/preferences" class="text-center"><v-list-item-title>Preferences</v-list-item-title></v-btn>

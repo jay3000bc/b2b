@@ -9,6 +9,8 @@ import AddProduct from '../views/AddProduct.vue'
 import ListProduct from '../views/ListProduct.vue'
 import ImageGallary from '../views/ImageGallery.vue'
 import SingleProduct from '../views/SingleProduct.vue'
+import MyShop from '../views/MyShop.vue'
+import PreviewProduct from '../views/PreviewProduct.vue'
 
 
 
@@ -45,17 +47,10 @@ Vue.use(VueRouter)
     },
   },
   {
-    path: '/add-product',
+    path: '/add-product/:id?',
     name: 'AddProduct',
     component: AddProduct,
-    meta: { 
-      requiresAuth: true
-    },
-  },
-  {
-    path: '/update-product/:id',
-    name: 'AddProduct',
-    component: AddProduct,
+    alias: '/update-product/:id',
     meta: { 
       requiresAuth: true
     },
@@ -80,6 +75,22 @@ Vue.use(VueRouter)
     path: '/product-details/:id',
     name: 'SingleProduct',
     component: SingleProduct,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/preview/:id',
+    name: 'PreviewProduct',
+    component: PreviewProduct,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/my-shop',
+    name: 'MyShop',
+    component: MyShop,
     meta: { 
       requiresAuth: true
     },
