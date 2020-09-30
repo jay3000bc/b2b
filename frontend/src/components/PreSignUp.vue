@@ -10,17 +10,16 @@
                 sm="12"
                 md="6"
                 class="pl-4"
-            >
-                <v-card-title class="font-weight-black text-center d-block">
-                Register As Buyer
+            > <v-card-title class="font-weight-black text-center d-block">
+                    Register As Seller
                 </v-card-title>
-                <v-card-text class="text-center divider-right">
-                    If you are in the retail bussiness and you buy products from Bussiness Brands, Distributors.
-                    wholesalers & Distributor - Register Here
+                <v-card-text class="text-center">
+                    If you are a bussiness brand, Distributor, Wholesaler - Register Here
                 </v-card-text>
-                <v-card-actions class="mb-3 text-center d-block">
-                     <SignUp user_type="b"/>
+                <v-card-actions class="mt-5 mb-3 text-center d-block">
+                     <SignUp user_type="s"/>
                 </v-card-actions>
+               
             </v-col>
 
             <v-col
@@ -30,14 +29,16 @@
                 class=""
             >
                <v-card-title class="font-weight-black text-center d-block">
-                    Register As Seller
+                Register As Buyer
                 </v-card-title>
-                <v-card-text class="text-center">
-                    If you are a bussiness brand, Distributor, Wholesaler - Register Here
+                <v-card-text class="text-center divider-right">
+                    If you are in the retail bussiness and you buy products from Bussiness Brands, Distributors.
+                    wholesalers & Distributor - Register Here
                 </v-card-text>
-                <v-card-actions class="mt-5 mb-3 text-center d-block">
-                     <SignUp user_type="s"/>
+                <v-card-actions class="mb-3 text-center d-block">
+                     <SignUp user_type="b"/>
                 </v-card-actions>
+               
              </v-col>
         </v-row>
     </v-card>
@@ -76,12 +77,12 @@ export default {
 </script>
 <style>
 .divider-right {
-    border-right:1px solid #000;
+    border-left:1px solid #000;
 }
 /* If the screen size is 600px wide or less */
   @media screen and (max-width: 600px) {
     .divider-right {
-    border-right:none;
+    border-left:none;
 }
   }
 </style>

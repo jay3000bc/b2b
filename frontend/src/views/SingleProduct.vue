@@ -13,28 +13,21 @@
                   <div class="single-product-content pa-5">
                       <v-row>
                           <v-col md="4">
-                              <!-- <v-carousel :show-arrows="false">
-                                    <v-carousel-item
-                                    v-for="(item,i) in images"
-                                    :key="i"
-                                    :src="item.src"
-                                    ></v-carousel-item>
-                                </v-carousel> -->
-                               <VueSlickCarousel
-                                  ref="c1"
-                                  :asNavFor="$refs.c2"
-                                  :focusOnSelect="true">
-                                  <div v-for="(item,i) in images"
-                                    :key="i"><img width="300" :src="item.src"></div>
-                                </VueSlickCarousel>
-                                <VueSlickCarousel
-                                  ref="c2"
-                                  :asNavFor="$refs.c1"
-                                  :slidesToShow="4"
-                                  :focusOnSelect="true">
-                                  <div v-for="(item,i) in images"
-                                    :key="i"><img width="50" :src="item.src"></div>
-                                </VueSlickCarousel>
+                            <VueSlickCarousel
+                              ref="c1"
+                              :asNavFor="$refs.c2"
+                              :focusOnSelect="true">
+                              <div v-for="(item,i) in images"
+                                :key="i"><img width="300" :src="item.src"></div>
+                            </VueSlickCarousel>
+                            <VueSlickCarousel
+                              ref="c2"
+                              :asNavFor="$refs.c1"
+                              :slidesToShow="4"
+                              :focusOnSelect="true">
+                              <div v-for="(item,i) in images"
+                                :key="i"><img width="50" :src="item.src"></div>
+                            </VueSlickCarousel>
                             </v-col>
                              <v-col md="8">
                                 <h2>{{name}}</h2><br>
@@ -206,6 +199,9 @@ export default {
 </script>
 
 <style>
+  .slick-slider:focus {
+     outline: none;
+  }
     /* If the screen size is 601px wide or more */
   @media screen and (min-width: 601px) {
     .home h2 {

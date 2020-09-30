@@ -53,8 +53,8 @@
                         ></v-textarea>
                     <label for="">Is taxable item ?</label>
                     <v-radio-group v-model="is_taxable" row>
-                        <v-radio @click="tax_input=true" label="Yes" value="yes"></v-radio>
-                        <v-radio @click="tax_input=false" label="No" value="no"></v-radio>
+                        <v-radio label="Yes" value="yes" @mousedown="tax_input=true"></v-radio>
+                        <v-radio label="No" value="no" @mousedown="tax_input=false"></v-radio>
                     </v-radio-group>
                     <v-text-field
                         v-show="tax_input"
@@ -145,7 +145,7 @@
                 </v-card-text>
                 <v-divider class="mt-12"></v-divider>
                 <v-card-actions>
-                  <v-btn text @click="previewProduct">Preview</v-btn>
+                  <v-btn   v-show="save_btn" text @click="previewProduct">Preview</v-btn>
                   <v-spacer></v-spacer>
                   <v-btn  color="primary" v-show="save_btn" text :disabled="!valid"  @click="validate">Save</v-btn>
                   <v-btn  color="primary" v-show="update_btn" text :disabled="!valid"  @click="validate">Update</v-btn>
@@ -247,10 +247,11 @@ export default {
               product_images: this.product_images,
           }
           this.$store.dispatch('previewProduct', data)
-          .then((res) => {
-            this.valid = false;
+          .then(() => {
+            //this.valid = false;
             //console.log(res.data.data.id)
-            this.$router.push('/preview/'+ res.data.data.id)
+            window.open('/preview/1', '_blank');
+            //this.$router.push('/preview/'+ res.data.data.id)
             
           })
           .catch(err => {
@@ -355,6 +356,7 @@ export default {
         this.$store.dispatch('getPreferences')
         .then((res) => {
             if(res.data.data) {
+              console.log(res.data.data)
                 this.preferences = res.data.data
                 // this.customer_type = this.preferences.customer_type
                 // this.visibility = this.preferences.visibility

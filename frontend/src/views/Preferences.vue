@@ -40,7 +40,13 @@
                           Would you like your product to be visible to everyone? <v-btn small color="success">Help?</v-btn>
                          </v-col>
                         <v-col cols="12" sm="2" md="2" lg="2" class="py-0">
-                        
+                            <v-select
+                                v-model="visibility"
+                                :items="options_yes_no"
+                                label="Select"
+                                outlined
+                                dense
+                            ></v-select>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -321,7 +327,9 @@ export default {
                 this.display_mrp = this.preferences.display_mrp
                 this.display_margin = this.preferences.display_margin
                 this.general_info = this.preferences.general_info
-                this.categories = this.preferences.categories
+                console.log(this.preferences.categories)
+                if(this.preferences.categories[0] != null  )
+                    this.categories = this.preferences.categories
             }
         })
         .catch(err => {

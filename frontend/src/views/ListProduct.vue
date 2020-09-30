@@ -11,8 +11,12 @@
                 <v-divider></v-divider>
                 <v-card-text>
                     <div class="product-content">
-                      <div>Category: </div>
-                      <div>Sub-Category: </div>
+                      <v-text-field
+                        label="Seach"
+                        placeholder="Search"
+                        outlined
+                        v-model="searchQuery"
+                      ></v-text-field>
                         <v-simple-table>
                             <template v-slot:default>
                                 <thead>
@@ -27,7 +31,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="item in products" :key="item.name">
+                                    <tr v-show="index <= producttoshow" v-for="(item, index) in resultQuery" :key="item.name">
                                         <td>{{ item.code }}</td>
                                         <td>{{ item.name }}</td>
                                         <td>
@@ -67,6 +71,9 @@
                                 </tbody>
                             </template>
                         </v-simple-table>
+                       <div class="text-center ma-3">
+                          <v-btn v-show="producttoshow < totalProducts" @click="producttoshow += 5">Load more...</v-btn>
+                       </div>
                     </div>
                 </v-card-text>
                 <v-divider class="mt-12"></v-divider>
@@ -104,21 +111,32 @@ export default {
             availability: null,
             status: null,
             options_active_inactive: ['active', 'inactive'],
+            producttoshow: 5,
+            totalProducts: 0,
+            searchQuery: null,
         }
     }, 
     computed: {
-        
+      resultQuery(){
+        if(this.searchQuery){
+        return this.products.filter((item)=>{
+          return this.searchQuery.toLowerCase().split(' ').every(v => item.name.toLowerCase().includes(v))
+        })
+        }else{
+          return this.products;
+        }
+      }
     },
     methods: {
       change_available(e, unit_id) {
-        console.log(e, unit_id);
+        //console.log(e, unit_id);
         let data = {
           unit_id: unit_id,
           availability: e
         } 
         this.$store.dispatch('updateProductAvalibility', data)
-        .then((res) => {
-          console.log(res)
+        .then(() => {
+          //console.log(res)
         })
         .catch(err => {
           // console.log(err)
@@ -130,14 +148,14 @@ export default {
         })
       },
       change_status(e, unit_id) {
-        console.log(e, unit_id);
+        //console.log(e, unit_id);
         let data = {
           unit_id: unit_id,
           status: e
         } 
         this.$store.dispatch('updateProductStatus', data)
-        .then((res) => {
-          console.log(res)
+        .then(() => {
+          //console.log(res)
         })
         .catch(err => {
           // console.log(err)
@@ -152,8 +170,9 @@ export default {
     created() {
       this.$store.dispatch('getProducts')
         .then((res) => {
-        console.log(res.data.data);
+        //console.log(res.data.data);
         this.products = res.data.data
+        this.totalProducts = this.products.length
       })
       .catch(err => {
           console.log(err)
@@ -161,7 +180,7 @@ export default {
       
     },
     mounted() {
-        //console.log(this.logo)
+      //console.log(this.totalProducts)
         
     }
 }

@@ -330,6 +330,34 @@ export default new Vuex.Store({
         })
       })
     },
+    saveImages({commit}, data) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}saveImages`, data:data, method: 'POST' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    saveChangePassword({commit}, data) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}changePassword`, data:data, method: 'POST' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
   },
   modules: {
   },

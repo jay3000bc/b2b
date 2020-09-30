@@ -315,9 +315,9 @@ export default {
 
       }
       this.$store.dispatch('profileUpdate', data)
-      .then(() => {
+      .then((res) => {
         this.profile_update = true
-        //console.log(res)
+        console.log(res)
         this.$swal({
             icon: 'success',
             title: 'Congrats',
@@ -334,24 +334,28 @@ export default {
       })
     },
     change_state() {
-      this.$store.dispatch('getCities', this.state)
-      .then((res) => {
-        this.cities = res.data.data
-      })
-      .catch(err => {
-         // console.log(err)
-         this.$swal({
-            icon: 'error',
-            title: 'Oops...',
-            text: err,
-        });
-      })
+      //console.log(this.state)
+      if(this.state != null)
+      {
+        this.$store.dispatch('getCities', this.state)
+        .then((res) => {
+          this.cities = res.data.data
+        })
+        .catch(err => {
+          // console.log(err)
+          this.$swal({
+              icon: 'error',
+              title: 'Oops...',
+              text: err,
+          });
+        })
+      }
     },
   },
   created() {
     this.$store.dispatch('getProfile')
       .then((res) => {
-        this.user = res.data.user
+        this.user = res.data.data
         this.business_name = this.user.business_name
         this.business_category = this.user.business_category
         this.business_address = this.user.business_address
@@ -372,7 +376,8 @@ export default {
         }
         if(this.user.status == 1)
           this.profile_update = true
-        this.change_state();
+        if(this.state != null)
+          this.change_state();
         this.city = this.user.city
       })
       .catch(err => {

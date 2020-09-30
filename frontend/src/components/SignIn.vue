@@ -45,6 +45,7 @@
                             color="success"
                             class="white--text"
                             @click="validateSignIn"
+                            v-on:keyup.13="validateSignIn"
                         >Sign In</v-btn>
                     </v-col>
                 </v-row>

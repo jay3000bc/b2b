@@ -162,7 +162,7 @@ export default {
     created() {
       if(this.$route.params.id) 
       {
-          this.$store.dispatch('previewProduct', this.$route.params.id)
+          this.$store.dispatch('previewProductDetails', this.$route.params.id)
           .then((res) => {
               if(res.data.data) {
                 console.log(res.data.data)

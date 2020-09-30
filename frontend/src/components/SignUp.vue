@@ -160,6 +160,16 @@ export default {
                         this.form.mobile_number = ''
                         this.form.password = ''
                         break;
+                     case 6:
+                        this.sending = false;
+                        this.$swal({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: res.data.message,
+                        });
+                        this.form.mobile_number = ''
+                        this.form.password = ''
+                        break;
                     default:
                     break;
                 }

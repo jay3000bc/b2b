@@ -11,6 +11,7 @@ import ImageGallary from '../views/ImageGallery.vue'
 import SingleProduct from '../views/SingleProduct.vue'
 import MyShop from '../views/MyShop.vue'
 import PreviewProduct from '../views/PreviewProduct.vue'
+import ChangePassword from '../views/ChangePassword.vue'
 
 
 
@@ -91,6 +92,14 @@ Vue.use(VueRouter)
     path: '/my-shop',
     name: 'MyShop',
     component: MyShop,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/change-password',
+    name: 'ChangePassword',
+    component: ChangePassword,
     meta: { 
       requiresAuth: true
     },
