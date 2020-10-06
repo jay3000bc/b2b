@@ -48,9 +48,9 @@
         <v-row
         >
             <v-col
-            cols="3"
-            sm="3"
-            md="3"
+            cols="12"
+            sm="2"
+            md="2"
             class="top-navigation"
             >
 
@@ -58,24 +58,38 @@
             <v-btn text small v-else>logo</v-btn>
             </v-col>
             <v-col
-            cols="3"
-            sm="6"
-            md="6"
+            cols="12"
+            sm="5"
+            md="5"
             >
-            <v-text-field
-                flat
-                solo-inverted
-                hide-details
-                append-icon="mdi-magnify"
-                label="Search your products"
-                class="hidden-sm-and-down"
-            ></v-text-field>
+                <v-text-field
+                    flat
+                    solo-inverted
+                    hide-details
+                    append-icon="mdi-magnify"
+                    label="Enter the keywords what you want to search"
+                    class="hidden-sm-and-down"
+                    v-model="search_keyword"
+                ></v-text-field>
             </v-col>
             <v-col
-            cols="3"
+                cols="12"
+                sm="2"
+                md="2"
+            >
+                <v-autocomplete
+                    flat
+                    solo-inverted
+                    ref="state"
+                    v-model="state"
+                    :items="states"
+                    placeholder="in All states"
+                ></v-autocomplete>
+            </v-col>
+            <v-col
+            cols="12"
             sm="3"
             md="3"
-            
             >
             <div class="float-right top-navigation-menu">
             <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
@@ -90,12 +104,52 @@
     name: 'TopSearchBar',
     data () {
         return {
+                search_keyword: null,
+                state: null,
                 mobile_number: null,
                 logo: null,
                 drawer: null,
                 user_type: null,
                 seller: false,
                 business_name: null,
+                states: [ 
+                "Andhra Pradesh",
+                "Arunachal Pradesh",
+                "Assam",
+                "Bihar",
+                "Chhattisgarh",
+                "Goa",
+                "Gujarat",
+                "Haryana",
+                "Himachal Pradesh",
+                "Jammu and Kashmir",
+                "Jharkhand",
+                "Karnataka",
+                "Kerala",
+                "Madhya Pradesh",
+                "Maharashtra",
+                "Manipur",
+                "Meghalaya",
+                "Mizoram",
+                "Nagaland",
+                "Odisha",
+                "Punjab",
+                "Rajasthan",
+                "Sikkim",
+                "Tamil Nadu",
+                "Telangana",
+                "Tripura",
+                "Uttarakhand",
+                "Uttar Pradesh",
+                "West Bengal",
+                "Andaman and Nicobar Islands",
+                "Chandigarh",
+                "Dadra and Nagar Haveli",
+                "Daman and Diu",
+                "Delhi",
+                "Lakshadweep",
+                "Puducherry"
+            ],
         }
     },
     methods: {
@@ -107,7 +161,7 @@
                 .catch(err => {
                     console.log(err)
             })
-            },
+        },
     },
     created() {
         this.$store.dispatch('getProfile')

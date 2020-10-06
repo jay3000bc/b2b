@@ -33,7 +33,21 @@
                     :items="business_categories"
                     label="Business category *"
                     placeholder="Selct Business Type or Category"
+                    v-on:change="change_business_category"
                   ></v-autocomplete>
+                  <v-text-field
+                    outlined
+                    ref="others"
+                    v-model="others"
+                    :rules="[() => !! others || 'This field is required',
+                      () => !! others && others.length <  100 || 'The maximum character allowed is 100',
+                      (others) => !! others && /[A-Za-z0-9_]/.test(others) || 'Only alphanumeric character allowed'
+                      ]"
+                    label="Other *"
+                    required
+                    placeholder="other"
+                    v-if="other_type"
+                  ></v-text-field>
                   <v-text-field
                     outlined
                     ref="business_address"
@@ -103,13 +117,8 @@
                         outlined
                         ref="mobile_number"
                         v-model="mobile_number"
-                        :rules="[() => !! mobile_number || 'This field is required',
-                        () => !! mobile_number && mobile_number.length ==  10 || 'Contact number must not be less than 10 digits',
-                        () => !! mobile_number && /[0-9]/.test(mobile_number) || 'Contact number must be integer'
-                        ]"
                         label="Contact numbers *"
-                        placeholder="7812312369"
-                        required
+                        :disabled="true"
                       ></v-text-field>
                       <v-btn @click="addRow" class="ml-2 mb-7 float-right" color="success" x-large><i class="fa fa-plus"></i></v-btn>
                     </v-list-item>
@@ -121,7 +130,9 @@
                         ref="contact.one"
                         v-model="contact.one"
                         :rules="[() => !! contact.one || 'This field is required',
-                        () => !! contact.one && contact.one.length ==  10 || 'Contact number must not be less than 10 digits']"
+                        () => !! contact.one && contact.one.length ==  10 || 'Contact number must not be less than 10 digits',
+                        () => !! contact.one && /[0-9]/.test(contact.one) || 'Contact number must be integer'
+                        ]"
                         label="Contact numbers *"
                         placeholder="7812312369"
                         required
@@ -194,7 +205,6 @@ export default {
  data () {
     return {
       user: null,
-
       data: '',
       valid: true,
       contacts: [],
@@ -263,6 +273,9 @@ export default {
       logo: null,
       formHasErrors: false,
       profile_update: false,
+      user_type: null,
+      other_type: false,
+      others: null
     }
   }, 
   computed: {
@@ -311,7 +324,8 @@ export default {
           country: this.country,
           gst: this.gst,
           email: this.email,
-          logo: this.logo
+          logo: this.logo,
+          others: this.others
 
       }
       this.$store.dispatch('profileUpdate', data)
@@ -351,6 +365,12 @@ export default {
         })
       }
     },
+    change_business_category() {
+      if(this.user_type == 'b')
+      {
+        this.other_type =  true
+      }
+    },
   },
   created() {
     this.$store.dispatch('getProfile')
@@ -379,6 +399,13 @@ export default {
         if(this.state != null)
           this.change_state();
         this.city = this.user.city
+        if(this.user.user_type == 'b')
+        {
+          this.business_categories.push('Others')
+          this.user_type = this.user.user_type
+          this.other_type =  true
+          this.others = this.user.other
+        }
       })
       .catch(err => {
           console.log(err)
