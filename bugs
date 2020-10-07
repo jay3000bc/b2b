@@ -1,3 +1,8 @@
-(1) Errors to be presented in a nice way. For example, if a users session has expired, it shows a 404 error “The requested URL /mukesh/b2b/add-product was not
+**(1)** Errors to be presented in a nice way. For example, if a users session has expired, it shows a 404 error “The requested URL /mukesh/b2b/add-product was not
 found on this server.” Which is not good.
-(2) 
+**(2)** Under “Preferences” the last field is “General Info/ Message” - this should actually appear in “My Shop” page.
+
+Open “My Shop” and the Logo is missing - here the Logo of that Seller should appear and not the usual B2B logo.
+
+In “My Shop” page, on the left we have the title “My Shop” and on the right, there should be a link called “Shop Info” which when clicked should display the
+Address, Phone number and Business Category of the Shop.
