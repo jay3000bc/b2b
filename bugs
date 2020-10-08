@@ -7,3 +7,7 @@ Open “My Shop” and the Logo is missing - here the Logo of that Seller should
 In “My Shop” page, on the left we have the title “My Shop” and on the right, there should be a link called “Shop Info” which when clicked should display the
 Address, Phone number and Business Category of the Shop.
 **(3)** In the Dashboard, Swap the 2 buttons “Page Views” and “Order Pending”. Check the functionality of “Page Views”.
+**(4)** In the Dashboard, just like you have sections - Your recent Sales, Newly added Buyers. Please add another section as described below:
+
+(a) For Sellers dashboard the section is called “My recent buyers”
+(b) For Buyers dashboard the section is called “My recent suppliers”
