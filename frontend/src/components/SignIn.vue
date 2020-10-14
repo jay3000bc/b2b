@@ -36,6 +36,7 @@
                             dense
                             type="password"
                             v-model="form.password"
+                            v-on:keyup.13="validateSignIn"
                         ></v-text-field>
                     </v-col> 
                     <v-col cols="12">

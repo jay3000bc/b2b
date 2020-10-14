@@ -3,33 +3,32 @@
     <v-main>
       <v-container
       >
-        <top-search-bar :mobile_number="mobile_number" :logo="logo"/>
+        <top-search-bar :mobile_number="mobile_number" :logo="logo" @onChangeSearchKeyword="onChangeSearchKeyword($event)" @onChangeState="onChangeState($event)" />
         <v-row justify="center">
           <v-col cols="12" sm="10" md="8" lg="12">
             <v-card>
                 <v-card-title>Search Results</v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
-                    <h3 class="mt-5 mb-3">Newly added Sellers</h3>
                     <v-row dense>
                         <v-col
-                        v-for="seller in sellers"
-                        :key="seller.id"
+                        v-for="result in search_results"
+                        :key="result.id"
                         cols="3"
                         >
                         <v-card class="mb-5 mr-2">
-                            <v-img
-                            :src="seller.logo_url"
-                            class="white--text align-end"
-                            gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-                            height="200px"
-                            >
-                            </v-img>
-                            <v-card-title v-text="seller.bussiness_name" class="justify-center"></v-card-title>
-                            <v-card-title class="justify-center" v-if="seller.state">{{seller.state}}, {{seller.city}}</v-card-title>
-                            <v-card-actions class="justify-center pt-0 pb-6">
-                                <v-btn class="success" :to="{ name: 'SingleSeller', params: { id: seller.id }}"> View </v-btn>
-                            </v-card-actions>
+                            <div>
+                              <v-img
+                              :src="result.logo_url"
+                              class="white--text align-end"
+                              gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+                              height="200px"
+                              >
+                              </v-img>
+                            </div>
+                            <v-card-title class="ml-0 py-0 pt-2 subtitle-2" v-if="result.user_type">{{result.business_name}}</v-card-title>
+                            <v-card-title class="ml-0 py-0 pt-2 subtitle-2" v-else>Sold by - {{result.business_name}}</v-card-title>
+                            <v-card-title class="ml-0 py-0 pb-2 subtitle-2" v-if="result.state">{{result.state}}, {{result.city}}</v-card-title>
                         </v-card>
                         </v-col>
                     </v-row>
@@ -61,26 +60,11 @@ export default {
     },
     data () {
         return {
-            mobile_number: null,
-            logo: null,
-            valid:true,
-            buyer: false,
-            desserts: [
-            {
-              name: 'Sunil Traders',
-              orderDate: '21/01/2020',
-              dispatchDate: '25/01/2020',
-              status: '1',
-            },
-            {
-              name: 'National Traders',
-              orderDate: '21/01/2020',
-              dispatchDate: '25/01/2020',
-              status: '0',
-            }
-          ],
-          sellers: [],
-          buyers: [],
+          search_results: [],
+          mobile_number: null,
+          logo: null,
+          valid:true,
+          buyer: false,
         }
     }, 
     computed: {
@@ -89,39 +73,54 @@ export default {
     methods: {
         validate() {
             
+        },
+        onChangeSearchKeyword()
+        {
+          //console.log('Hello' + this.$route.params.search_key)
+          let data= {
+            search_keyword: this.$route.params.search_key,
+            state: ''
+          }
+          this.$store.dispatch('getSearchResult', data)
+              .then((res) => {
+                this.search_results = res.data.data
+              //console.log(res.data.data)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+        },
+        onChangeState(e)
+        {
+          //console.log(e)
+          let data= {
+            search_keyword: this.$route.params.search_key,
+            state: e
+          }
+          this.$store.dispatch('getSearchResult', data)
+              .then((res) => {
+                this.search_results = res.data.data
+              //console.log(res.data.data)
+          })
+          .catch(err => {
+            console.log(err)
+          })
         }
     },
     created() {
-      this.$store.dispatch('getProfile')
+      let data= {
+        search_keyword: this.$route.params.search_key,
+        state: ''
+      }
+      this.$store.dispatch('getSearchResult', data)
           .then((res) => {
-          //console.log(res.data.data)
-          let user = res.data.data
-          if(user.user_type == 'b')
-              this.buyer = true
-          //console.log(this.user_type)
+            this.search_results = res.data.data
+          console.log(res.data.data)
+      })
+      .catch(err => {
+        console.log(err)
+      })
       
-      })
-      .catch(err => {
-        console.log(err)
-      })
-      this.$store.dispatch('getSellers')
-          .then((res) => {
-            this.sellers = res.data.data
-          //console.log(res.data.data)
-
-        })
-      .catch(err => {
-        console.log(err)
-      })
-      this.$store.dispatch('getBuyers')
-          .then((res) => {
-            this.buyers = res.data.data
-          //console.log(res.data.data)
-
-        })
-      .catch(err => {
-        console.log(err)
-      })
     },
     mounted() {
         //console.log(this.logo)

@@ -120,7 +120,7 @@
                             <v-card-title v-text="buyer.bussiness_name" class="justify-center"></v-card-title>
                             <v-card-title class="justify-center" v-if="buyer.state">{{buyer.state}}, {{buyer.city}}</v-card-title>
                             <v-card-actions class="justify-center pt-0 pb-6">
-                                <v-btn class="success" :to="{ name: 'Singlebuyer', params: { id: buyer.id }}"> View </v-btn>
+                                <v-btn class="success"> View </v-btn>
                             </v-card-actions>
                         </v-card>
                         </v-col>

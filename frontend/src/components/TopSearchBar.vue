@@ -62,15 +62,19 @@
             sm="5"
             md="5"
             >
-                <v-text-field
+                <v-autocomplete
+                    v-model="select"
+                    :loading="loading"
+                    :items="items"
+                    :search-input.sync="search"
                     flat
-                    solo-inverted
-                    hide-details
-                    append-icon="mdi-magnify"
                     label="Enter the keywords what you want to search"
-                    class="hidden-sm-and-down"
-                    v-model="search_keyword"
-                ></v-text-field>
+                    solo-inverted
+                    no-filter
+                    clearable
+                    v-on:change='onChange'
+                    v-on:keyup.13="onChange"
+                    ></v-autocomplete>
             </v-col>
             <v-col
                 cols="12"
@@ -83,6 +87,7 @@
                     ref="state"
                     v-model="state"
                     :items="states"
+                    v-on:change='onChangeState'
                     placeholder="in All states"
                 ></v-autocomplete>
             </v-col>
@@ -104,6 +109,12 @@
     name: 'TopSearchBar',
     data () {
         return {
+                loading: false,
+                items: [],
+                search: null,
+                select: null,
+            
+                suggestions: null,
                 search_keyword: null,
                 state: null,
                 mobile_number: null,
@@ -152,7 +163,42 @@
             ],
         }
     },
+    computed: {
+         
+    },
+     watch: {
+      search (val) {
+        if (val.length < 3) return;
+        val && val !== this.select && this.querySelections(val)
+
+      },
+    },
     methods: {
+        onChange(e) {
+            //console.log(e)
+            this.state = null
+            this.select = this.$route.params.search_key
+            this.$router.push(`/search-results/${e}`)
+            this.$emit('onChangeSearchKeyword', e)
+
+        },
+        onChangeState(e) {
+            this.$emit('onChangeState', e)
+        },
+        querySelections (v) {
+            this.loading = true
+            this.$store.dispatch('search', v)
+                .then((res) => {
+                this.select = this.$route.params.search_key
+                this.items =  res.data.data
+                this.loading = false
+            
+            })
+            .catch(err => {
+                console.log(err)
+            })
+           
+        },
         logout() {
             this.$store.dispatch('logout')
                 .then(() => {
@@ -164,6 +210,10 @@
         },
     },
     created() {
+        if(this.$route.params.search_key){
+            console.log(this.$route.params.search_key)
+            this.select = this.$route.params.search_key
+        }
         this.$store.dispatch('getProfile')
             .then((res) => {
             //console.log(res)
@@ -180,6 +230,7 @@
         .catch(err => {
           console.log(err)
         })
+
     },
   }
 </script>

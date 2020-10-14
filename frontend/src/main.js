@@ -8,6 +8,7 @@ import Axios from 'axios'
 import OtpInput from "@bachdgvn/vue-otp-input";
 import VueSweetalert2 from 'vue-sweetalert2';
 
+
 Vue.prototype.$http = Axios;
 const token = localStorage.getItem('token')
 if (token) {

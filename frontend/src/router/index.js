@@ -12,6 +12,7 @@ import SingleProduct from '../views/SingleProduct.vue'
 import MyShop from '../views/MyShop.vue'
 import PreviewProduct from '../views/PreviewProduct.vue'
 import ChangePassword from '../views/ChangePassword.vue'
+import SearchResult from '../views/SearchResult.vue'
 
 
 
@@ -100,6 +101,14 @@ Vue.use(VueRouter)
     path: '/change-password',
     name: 'ChangePassword',
     component: ChangePassword,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/search-results/:search_key',
+    name: 'SeachResult',
+    component: SearchResult,
     meta: { 
       requiresAuth: true
     },
