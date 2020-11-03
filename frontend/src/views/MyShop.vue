@@ -3,17 +3,31 @@
     <v-main>
       <v-container
       >
-        <top-search-bar :mobile_number="mobile_number" :logo="logo"/>
+        <top-search-bar/>
         <v-row justify="center">
           <v-col cols="12" sm="10" md="8" lg="12">
               <v-card>
-                <v-card-title>My Shop</v-card-title>
+                <v-card-title>
+                  <v-row>
+                    <v-col cols="12" sm="8" >
+                      <img :src="logo" width="50" alt=""> 
+                    </v-col>
+                    <v-col cols="12" sm="4" class="align-right">
+                      <v-text-field
+                        label="Seach"
+                        :placeholder="business_name"
+                        outlined
+                        v-model="searchQuery"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
                   <div class="my-shop-content">
                      <v-row dense>
                         <v-col
-                        v-for="product in products"
+                        v-for="product in resultQuery"
                         :key="product.name"
                         cols="3"
                         >
@@ -63,11 +77,21 @@ export default {
         return {
             mobile_number: null,
             logo: null,
+            business_name: null,
             products: [],
+            searchQuery: null,
         }
     }, 
     computed: {
-        
+      resultQuery(){
+        if(this.searchQuery){
+          return this.products.filter((item)=>{
+            return this.searchQuery.toLowerCase().split(' ').every(v => item.name.toLowerCase().includes(v))
+          })
+        }else{
+          return this.products;
+        }
+      }
     },
     methods: {
         validate() {
@@ -85,6 +109,20 @@ export default {
       .catch(err => {
           console.log(err)
       })
+
+      this.$store.dispatch('getProfile')
+            .then((res) => {
+            //console.log(res)
+            let user = res.data.data
+            this.logo = user.logo_url
+            this.business_name = `Search in ${user.business_name}`
+            //console.log(this.user_type)
+        
+        })
+        .catch(err => {
+          console.log(err)
+        })
+
     },
     mounted() {
         //console.log(this.logo)

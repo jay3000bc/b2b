@@ -18,28 +18,38 @@
 
             <v-list dense>
             <v-list-item>
-                <v-list-item-content v-if="seller">
+                <v-list-item-content v-if="user_type1==='s'">
                     <v-btn to="/dashboard" class="text-center"><v-list-item-title >Dashboard</v-list-item-title></v-btn>
                     <v-btn to="/profile" class="text-center"><v-list-item-title >Profile</v-list-item-title></v-btn>
                     <v-btn to="/change-password" class="text-center"><v-list-item-title to="/profile">Change Password</v-list-item-title></v-btn>
                     <v-btn to="/preferences" class="text-center"><v-list-item-title>Preferences</v-list-item-title></v-btn>
                     <v-btn to="/list-product" class="text-center"><v-list-item-title>Products</v-list-item-title></v-btn>
                     <v-btn to="/image-gallery" class="text-center"><v-list-item-title>Image Gallery</v-list-item-title></v-btn>
-                    <v-btn><v-list-item-title>Buyers</v-list-item-title></v-btn>
-                    <v-btn><v-list-item-title>Orders</v-list-item-title></v-btn>
+                    <v-btn to="/buyers"><v-list-item-title class="text-center">Buyers</v-list-item-title></v-btn>
+                    <v-btn to="/orders" class="text-center"><v-list-item-title>Orders</v-list-item-title></v-btn>
                     <v-btn to="/my-shop" class="text-center"><v-list-item-title>My Shop</v-list-item-title></v-btn>
-                    <v-btn><v-list-item-title>Became a Buyer</v-list-item-title></v-btn>
-                    <v-btn><v-list-item-title>Help &amp; Support</v-list-item-title></v-btn>
+                    <v-btn to="/become-buyer"  class="text-center" v-if="db_user_type==='s'"><v-list-item-title >Became a Buyer</v-list-item-title></v-btn>
+                    <v-btn v-else-if="db_user_type='bs'" @click="viewAsBuyer"><v-list-item-title>Switch to Buyer</v-list-item-title></v-btn>
+                    <v-btn to="/help-support" class="text-center"><v-list-item-title>Help &amp; Support</v-list-item-title></v-btn>
                     <v-btn><v-list-item-title @click="logout" >Logout</v-list-item-title></v-btn>
                 </v-list-item-content>
-                <v-list-item-content v-else>
+                <v-list-item-content v-else-if="user_type1==='b'">
                     <v-btn to="/dashboard" class="text-center"><v-list-item-title >Dashboard</v-list-item-title></v-btn>
                     <v-btn to="/profile" class="text-center"><v-list-item-title >Profile</v-list-item-title></v-btn>
                     <v-btn to="/change-password" class="text-center"><v-list-item-title>Change Password</v-list-item-title></v-btn>
-                    <v-btn class="text-center"><v-list-item-title>Suppliers</v-list-item-title></v-btn>
-                    <v-btn class="text-center"><v-list-item-title>Order History</v-list-item-title></v-btn>
-                    <v-btn><v-list-item-title>Became a Seller</v-list-item-title></v-btn>
-                    <v-btn><v-list-item-title>Help &amp; Support</v-list-item-title></v-btn>
+                    <v-btn class="text-center" to="/suppliers"><v-list-item-title>Suppliers</v-list-item-title></v-btn>
+                    <v-btn to="/order-history" class="text-center"><v-list-item-title>Order History</v-list-item-title></v-btn>
+                    <v-btn  to="/become-seller" class="text-center" v-if="db_user_type==='b'"><v-list-item-title >Became a Seller</v-list-item-title></v-btn>
+                    <v-btn v-else-if="db_user_type==='bs'" @click="viewAsSeller"><v-list-item-title>Switch to Seller</v-list-item-title></v-btn>
+                    <v-btn to="/help-support" class="text-center"><v-list-item-title>Help &amp; Support</v-list-item-title></v-btn>
+                    <v-btn><v-list-item-title @click="logout" >Logout</v-list-item-title></v-btn>
+                </v-list-item-content>
+                <v-list-item-content v-else-if="user_type1==='bs'">
+                    <v-btn @click="viewAsBuyer"  class="text-center"><v-list-item-title >View as Buyer</v-list-item-title></v-btn>
+                    <v-btn @click="viewAsSeller"  class="text-center"><v-list-item-title >View as Seller</v-list-item-title></v-btn>
+                    <v-btn><v-list-item-title @click="logout" >Logout</v-list-item-title></v-btn>
+                </v-list-item-content>
+                <v-list-item-content v-else>
                     <v-btn><v-list-item-title @click="logout" >Logout</v-list-item-title></v-btn>
                 </v-list-item-content>
             </v-list-item>
@@ -71,9 +81,7 @@
                     label="Enter the keywords what you want to search"
                     solo-inverted
                     no-filter
-                    clearable
                     v-on:change='onChange'
-                    v-on:keyup.13="onChange"
                     ></v-autocomplete>
             </v-col>
             <v-col
@@ -113,14 +121,14 @@
                 items: [],
                 search: null,
                 select: null,
-            
+                db_user_type: null,
                 suggestions: null,
                 search_keyword: null,
                 state: null,
                 mobile_number: null,
                 logo: null,
                 drawer: null,
-                user_type: null,
+                user_type1: null,
                 seller: false,
                 business_name: null,
                 states: [ 
@@ -166,21 +174,28 @@
     computed: {
          
     },
-     watch: {
+    watch: {
       search (val) {
-        if (val.length < 3) return;
-        val && val !== this.select && this.querySelections(val)
-
-      },
+            if (val === null) return;
+            if (val.length < 3) return;
+            val && val !== this.select && this.querySelections(val)
+        },
     },
     methods: {
+        viewAsBuyer() {
+            this.user_type1 = 'b'
+            localStorage.setItem('user_account', 'b')
+        },
+        viewAsSeller() {
+            this.user_type1 = 's'
+            localStorage.setItem('user_account', 's')
+        },
         onChange(e) {
-            //console.log(e)
+            if (typeof e === "undefined") { return;}
             this.state = null
             this.select = this.$route.params.search_key
             this.$router.push(`/search-results/${e}`)
             this.$emit('onChangeSearchKeyword', e)
-
         },
         onChangeState(e) {
             this.$emit('onChangeState', e)
@@ -189,7 +204,7 @@
             this.loading = true
             this.$store.dispatch('search', v)
                 .then((res) => {
-                this.select = this.$route.params.search_key
+                //this.select = this.$route.params.search_key
                 this.items =  res.data.data
                 this.loading = false
             
@@ -216,15 +231,22 @@
         }
         this.$store.dispatch('getProfile')
             .then((res) => {
-            //console.log(res)
+            console.log(res)
             let user = res.data.data
             this.business_name = user.business_name
             this.mobile_number = user.mobile_number
             this.logo = user.logo_url
-            this.user_type = user.user_type
+            this.user_type1 = user.user_type
+            this.db_user_type = user.user_type
             if(this.user_type == 's')
                 this.seller = true
-            //console.log(this.user_type)
+            //console.log(this.user_type1)
+            if(localStorage.getItem('user_account') == 'b') {
+                this.user_type1 = 'b'
+            }
+            else if(localStorage.getItem('user_account') == 's') {
+                this.user_type1 = 's'
+            }
         
         })
         .catch(err => {
@@ -232,5 +254,8 @@
         })
 
     },
+    mounted() {
+        console.log(localStorage.getItem('user_account'))
+    }
   }
 </script>

@@ -13,6 +13,13 @@ import MyShop from '../views/MyShop.vue'
 import PreviewProduct from '../views/PreviewProduct.vue'
 import ChangePassword from '../views/ChangePassword.vue'
 import SearchResult from '../views/SearchResult.vue'
+import Buyers from '../views/Buyers.vue'
+import Suppliers from '../views/Suppliers.vue'
+import BecomeBuyer from '../views/BecomeBuyer.vue'
+import BecomeSeller from '../views/BecomeSeller.vue'
+import HelpSupport from '../views/HelpSupport.vue'
+import OrderHistory from '../views/OrderHistory.vue'
+import Orders from '../views/Orders.vue'
 
 
 
@@ -23,6 +30,11 @@ Vue.use(VueRouter)
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/reset-password/:token',
+    name: 'Home',
+    component: Home,
   },
   {
     path: '/profile',
@@ -109,6 +121,62 @@ Vue.use(VueRouter)
     path: '/search-results/:search_key',
     name: 'SeachResult',
     component: SearchResult,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/buyers',
+    name: 'Buyers',
+    component: Buyers,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/become-buyer',
+    name: 'BecomeBuyer',
+    component: BecomeBuyer,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/suppliers',
+    name: 'Suppliers',
+    component: Suppliers,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/help-support',
+    name: 'HelpSupport',
+    component: HelpSupport,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/order-history',
+    name: 'OrderHistory',
+    component: OrderHistory,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/orders',
+    name: 'Orders',
+    component: Orders,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/become-seller',
+    name: 'BecomeSeller',
+    component: BecomeSeller,
     meta: { 
       requiresAuth: true
     },

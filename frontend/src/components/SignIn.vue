@@ -39,6 +39,9 @@
                             v-on:keyup.13="validateSignIn"
                         ></v-text-field>
                     </v-col> 
+                    <v-col cols="12" sm="12" md="12" class="pt-0 pb-0 text-right">
+                        <ForgotPassword v-model="showForgotPassword" @click="forgotPassword"/>
+                    </v-col>
                     <v-col cols="12">
                         <v-btn block 
                             :loading="sending"
@@ -56,6 +59,7 @@
 </template>
 
 <script>
+import ForgotPassword from '@/components/ForgotPassword.vue'
 import {
     required,
     minLength,
@@ -63,10 +67,15 @@ import {
     numeric
   } from 'vuelidate/lib/validators';
 
+
 export default {
+    components: {
+        ForgotPassword
+    },
     name: 'SignIn',
     data () {
         return {
+            showForgotPassword: false,
             sending: false,
             verify_otp: false,
             form: {
@@ -142,6 +151,9 @@ export default {
             if (!this.$v.$invalid) {
                 this.signIn()
             }
+        },
+        forgotPassword() {
+            this.show = false
         }
     },
     props: {
@@ -149,13 +161,19 @@ export default {
     },
     computed: {
         show: {
-        get () {
-            return this.value
-        },
-        set (value) {
-            this.$emit('input', value)
+            get () {
+                return this.value
+            },
+            set (value) {
+                this.$emit('input', value)
+            }
         }
-        }
+    },
+    created() {
+       
+    },
+    mounted() {
+        
     }
 }
 </script>

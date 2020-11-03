@@ -7,6 +7,7 @@ import Vuelidate from 'vuelidate'
 import Axios from 'axios'
 import OtpInput from "@bachdgvn/vue-otp-input";
 import VueSweetalert2 from 'vue-sweetalert2';
+import VueCookies from 'vue-cookies'
 
 
 Vue.prototype.$http = Axios;
@@ -32,6 +33,9 @@ if (user_token) {
 
 Vue.prototype.$apiURI = `http://${process.env.VUE_APP_HOST}/public`;
 
+
+
+Vue.use(VueCookies)
 
 new Vue({
   router,

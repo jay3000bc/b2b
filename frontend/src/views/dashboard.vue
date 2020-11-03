@@ -59,11 +59,10 @@
                             height="200px"
                             >
                             </v-img>
-                            <v-card-title v-text="seller.bussiness_name" class="justify-center"></v-card-title>
-                            <v-card-title class="justify-center" v-if="seller.state">{{seller.state}}, {{seller.city}}</v-card-title>
-                            <v-card-actions class="justify-center pt-0 pb-6">
+                            <v-card-title class="justify-center caption" v-if="seller.state">{{seller.business_name}}<br>{{seller.city}}, {{seller.state}}</v-card-title>
+                            <!-- <v-card-actions class="justify-center pt-0 pb-6">
                                 <v-btn class="success" :to="{ name: 'SingleSeller', params: { id: seller.id }}"> View </v-btn>
-                            </v-card-actions>
+                            </v-card-actions> -->
                         </v-card>
                         </v-col>
                     </v-row>
@@ -117,11 +116,7 @@
                             height="200px"
                             >
                             </v-img>
-                            <v-card-title v-text="buyer.bussiness_name" class="justify-center"></v-card-title>
-                            <v-card-title class="justify-center" v-if="buyer.state">{{buyer.state}}, {{buyer.city}}</v-card-title>
-                            <v-card-actions class="justify-center pt-0 pb-6">
-                                <v-btn class="success"> View </v-btn>
-                            </v-card-actions>
+                            <v-card-title class="justify-center caption">{{buyer.business_name}}<br>{{buyer.city}}, {{buyer.state}} </v-card-title>
                         </v-card>
                         </v-col>
                     </v-row>

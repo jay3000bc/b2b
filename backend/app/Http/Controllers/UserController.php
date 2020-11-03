@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use  App\User;
 use Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Helper\ResponseBuilder;
 
 class UserController extends Controller
@@ -80,6 +81,20 @@ class UserController extends Controller
             $user->other = $request->others;
         $user->ip = $request->ip();
 
+        $sound = " ";
+        $words = explode(" ", $request->business_name);
+        foreach($words as $word)
+        {
+            $sound .= metaphone($word). " ";
+        }
+
+        $words = explode(" ", $request->business_category);
+        foreach($words as $word)
+        {
+            $sound .= metaphone($word). " ";
+        }
+        $user->indexing = $sound;
+
         // logo upload
         if($request->logo)
         {
@@ -153,7 +168,7 @@ class UserController extends Controller
     {
         
          $data = User::where('user_type', '=', 's')->get();
-         if($data)
+         if(count($data))
          {
             $status = 2;
             $info = "Listed user data succesfully";
@@ -172,7 +187,7 @@ class UserController extends Controller
     {
         
          $data = User::where('user_type', '=', 'b')->get();
-         if($data)
+         if(count($data) > 0)
          {
             $status = 2;
             $info = "Listed user data succesfully";
@@ -187,5 +202,25 @@ class UserController extends Controller
          return ResponseBuilder::result($status, $info, $data);
     }
 
+    public function testEmail(Request $request)
+	{ 
+		$data = array('name'=>"Mukesh Goswami", "body" => "Test mail");
+    
+		Mail::send('emails.resetpassword', $data, function($message) {
+		    $message->to('goswamim654@gmail.com', 'Mukesh Goswami')
+		            ->subject('b2b Testing Mail');
+		    $message->from('ankitpro999@gmail.com','b2b');
+		});
 
+    }
+    
+    public function  updateUserType() {
+        $user = Auth::user();
+        $user->user_type = 'bs';
+        $user->save();
+        $status = 2;
+        $message = "User type updated  successfully";
+        return ResponseBuilder::result($status, $message, $user);
+    }
+    
 }

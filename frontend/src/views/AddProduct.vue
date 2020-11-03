@@ -65,7 +65,7 @@
                         placeholder="Tax"
                     ></v-text-field>
                     <label for="">Upload your product photo(s)</label>
-                    <v-btn  color="primary" text class="float-right pb-3">Add From Gallary</v-btn>
+                    <image-gallery @onImageSelected ="onImageSelected($event)" v-model="showImageGallery"/>
                     <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" @vdropzone-complete="afterComplete"></vue-dropzone>
                     <v-row class="mt-4" v-for="(product, index) in products" v-bind:key="index">
                         <v-col :sm="unit_inputbox_length">
@@ -78,9 +78,8 @@
                                 :rules="[() => !! product.unit || 'This field is required']"
                             ></v-text-field>
                         </v-col>
-                        <v-col sm="2">
+                        <v-col sm="2" v-if="product_code_preference == 'yes'">
                            <v-text-field
-                              v-if="product_code_preference == 'yes'"
                               outlined
                               ref="code"
                               v-model="product.code"
@@ -88,19 +87,17 @@
                               placeholder="Product Code"
                           ></v-text-field>
                         </v-col>
-                        <v-col sm="1">
+                        <v-col :sm="mrp_inputbox_length" v-if="product_mrp_preference == 'yes'">
                             <v-text-field
-                               v-if="product_mrp_preference == 'yes'"
-                                outlined
+                               outlined
                                 ref="mrp"
                                 v-model="product.mrp"
                                 label="MRP"
                                 placeholder="MRP"
                             ></v-text-field>
                         </v-col>
-                        <v-col sm="1">
+                        <v-col :sm="rate_inputbox_length" v-if="product_rate_preference == 'yes'">
                             <v-text-field
-                                v-if="product_rate_preference == 'yes'"
                                 outlined
                                 ref="rate"
                                 v-model="product.rate"
@@ -108,7 +105,7 @@
                                 placeholder="Rate"
                             ></v-text-field>
                         </v-col>
-                        <v-col sm="1">
+                        <v-col :sm="moq_inputbox_length">
                             <v-text-field
                                 outlined
                                 ref="moq"
@@ -127,9 +124,8 @@
                             outlined
                             ></v-select>
                         </v-col>
-                        <v-col sm="2">
+                        <v-col sm="2" v-if="product_stock_preference == 'yes'">
                             <v-text-field
-                                v-if="product_stock_preference == 'yes'"
                                 outlined
                                 ref="stock"
                                 v-model="product.stock"
@@ -165,17 +161,23 @@ import Footer from '@/components/Footer.vue'
 import TopSearchBar from '@/components/TopSearchBar.vue'
 import vueDropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
-
+import ImageGallery from '@/components/ImageGallery.vue'
 export default {
     name: 'AddProduct',
     components: {
         Footer,
         TopSearchBar,
-        vueDropzone
+        vueDropzone,
+        ImageGallery
     },
     data () {
       return {
+        selected_images : [],
+        business_name: null,
         unit_inputbox_length: 2,
+        mrp_inputbox_length: 1,
+        rate_inputbox_length: 1,
+        moq_inputbox_length: 1,
         title: 'Add Product',
         product_code_disabled: false,
         save_btn: true,
@@ -191,8 +193,8 @@ export default {
         product_code: null,
         product_name: null,
         product_description: null,
-        is_taxable: null,
-        tax: null,
+        is_taxable: 'no',
+        tax: 0,
         tax_input: false,
         dropzoneOptions: {
             url: 'https://httpbin.org/post',
@@ -211,7 +213,7 @@ export default {
           mrp: '',
           rate: '',
           moq: 1,
-          available: '',
+          available: 'yes',
           stock: ''
         },
         products: [],
@@ -272,23 +274,43 @@ export default {
               tax: this.tax,
               product: this.products,
               product_images: this.product_images,
+              selected_images: this.selected_images
           }
           this.$store.dispatch('saveProduct', data)
-          .then(() => {
-            this.valid = false;
-            //console.log(res)
-            this.$swal({
-                icon: 'success',
-                title: 'Congrats',
-                text: 'Product added successfully',
-            });
+          .then((res) => {
+            switch (res.data.status) {
+                case 2:
+                  this.valid = false;
+                  this.sending = false;
+                  this.$swal({
+                      icon: 'success',
+                      title: 'Congrats',
+                      text: 'Product added successfully',
+                  });
+                  this.$router.push('/list-product') 
+                  break;
+                case 3:
+                  var error = ''
+                  for (const prop in res.data.data) {
+                    error += res.data.data[prop]
+                  }
+                  this.$swal({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: `${error}`,
+                  });
+                  break;
+                default:
+                break;
+            }
+
           })
           .catch(err => {
-            // console.log(err)
+            console.log(err)
             this.$swal({
                 icon: 'error',
                 title: 'Oops...',
-                text: err,
+                text: `${err}`,
             });
           })
         },
@@ -301,6 +323,7 @@ export default {
               tax: this.tax,
               product: this.products,
               product_images: this.product_images,
+              selected_images: this.selected_images,
               id:  this.$route.params.id
           }
           this.$store.dispatch('updateProduct', data)
@@ -345,6 +368,13 @@ export default {
         removeProductUnit(index) {
           this.products.splice(index,1)
         },
+        onImageSelected(image){
+            var file = { size: 200, name: '' };
+            this.selected_images.push(image)
+            this.$refs.myVueDropzone.manuallyAddFile(file, image);
+                
+          //console.log(e)
+        },
     },
     watch: {
       search (val) {
@@ -370,11 +400,67 @@ export default {
                 if(this.preferences.categories)
                   this.product_categories_input = true
                 console.log(this.preferences.categories)
+                if(this.product_stock_preference == 'no' && this.product_code_preference== 'no' && this.product_rate_preference == 'no' && this.product_mrp_preference == 'no' )
+                {
+                  this.unit_inputbox_length = 6
+                  this.moq_inputbox_length = 3
+                }
+                else if(this.product_stock_preference == 'yes' && this.product_code_preference== 'no' && this.product_rate_preference == 'no' && this.product_mrp_preference == 'no' )
+                {
+                  this.unit_inputbox_length = 5
+                  this.moq_inputbox_length = 2
+                }
+                else if(this.product_stock_preference == 'yes' && this.product_code_preference== 'yes' && this.product_rate_preference == 'no' && this.product_mrp_preference == 'no' )
+                {
+                  this.unit_inputbox_length = 4
+                  this.moq_inputbox_length = 1
+                }
+                else if(this.product_stock_preference == 'yes' && this.product_code_preference== 'yes' && this.product_rate_preference == 'yes' && this.product_mrp_preference == 'no' )
+                {
+                  this.unit_inputbox_length = 3
+                  this.moq_inputbox_length = 1
+                }
+                else if(this.product_stock_preference == 'yes' && this.product_code_preference== 'yes' && this.product_rate_preference == 'no' && this.product_mrp_preference == 'no' )
+                {
+                  this.unit_inputbox_length = 4
+                  this.moq_inputbox_length = 1
+                }
+                else if(this.product_stock_preference == 'no' && this.product_code_preference== 'no' && this.product_rate_preference == 'yes' && this.product_mrp_preference == 'yes' )
+                {
+                  this.unit_inputbox_length = 5
+                  this.moq_inputbox_length = 2
+                }
+                 else if(this.product_stock_preference == 'no' && this.product_code_preference== 'yes' && this.product_rate_preference == 'yes' && this.product_mrp_preference == 'yes' )
+                {
+                  this.unit_inputbox_length = 4
+                  this.moq_inputbox_length = 1
+                }
+                 else if(this.product_stock_preference == 'yes' && this.product_code_preference== 'no' && this.product_rate_preference == 'yes' && this.product_mrp_preference == 'yes' )
+                {
+                  this.unit_inputbox_length = 4
+                  this.moq_inputbox_length = 1
+                }
+                 else if(this.product_stock_preference == 'yes' && this.product_code_preference== 'yes' && this.product_rate_preference == 'no' && this.product_mrp_preference == 'yes' )
+                {
+                  this.unit_inputbox_length = 3
+                  this.moq_inputbox_length = 1
+                }
+                 else if(this.product_stock_preference == 'no' && this.product_code_preference== 'yes' && this.product_rate_preference == 'no' && this.product_mrp_preference == 'yes' )
+                {
+                  this.unit_inputbox_length = 4
+                  this.moq_inputbox_length = 2
+                }
+                 else if(this.product_stock_preference == 'yes' && this.product_code_preference== 'no' && this.product_rate_preference == 'yes' && this.product_mrp_preference == 'no' )
+                {
+                  this.unit_inputbox_length = 4
+                  this.moq_inputbox_length = 2
+                }
             }
         })
         .catch(err => {
             console.log(err)
         })
+
 
         if(this.$route.params.id) {
           this.title = 'Edit Product'

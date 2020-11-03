@@ -38,8 +38,8 @@
                                           {{ item.rate }}
                                         </td>
                                         <td>
-                                            <span class="mr-2"  v-for="photo in item.photos" :key="photo.photo_name">
-                                                <img width="50" :src="photo.photo_url" :alt="photo.photo_name">
+                                            <span class="mr-2"  v-for="photo in item.thumbnail_image" :key="photo">
+                                                <img width="50" height="50" :src="photo" :alt="photo">
                                             </span>
                                         </td>
                                          <td>

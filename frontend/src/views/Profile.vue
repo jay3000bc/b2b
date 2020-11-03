@@ -209,7 +209,7 @@ export default {
       valid: true,
       contacts: [],
       state_selceted: [],
-      business_categories: ['abc','def', 'xyz'],
+      business_categories: [process.env.VUE_APP_GARMENTS, process.env.VUE_APP_GROCERY, process.env.VUE_APP_PHAMACIST+'/ '+ process.env.VUE_APP_DRIGGIST],
       states: [ 
         "Andhra Pradesh",
         "Arunachal Pradesh",
@@ -412,7 +412,7 @@ export default {
       })
     },
     mounted() {
-      //console.log(this.state_selected)
+      //console.log(process.env.VUE_APP_GARMENTS)
       
     }
 }

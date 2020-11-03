@@ -7,29 +7,52 @@
         <v-row justify="center">
           <v-col cols="12" sm="10" md="8" lg="12">
               <v-card>
-                <v-card-title>Product Details<v-spacer></v-spacer><v-btn>Order Quantity [{{order_quantity}}]</v-btn></v-card-title>
+                <v-card-title>
+                  <v-row>
+                      <v-col cols="12" sm="5" >
+                        <img :src="logo" width="50" alt=""> 
+                      </v-col>
+                      <v-col cols="12" sm="3">
+                        <v-btn class="float-right mt-2">Order Quantity [{{totalQuantity}}]</v-btn>
+                      </v-col>
+                      <v-col cols="12" sm="4" class="float-right">
+                         <v-autocomplete
+                          :items="product_autocomplete"
+                          outlined
+                          item-text="name"
+                          item-value="id"
+                          :placeholder="business_name"
+                          @change="searchProduct"
+                        ></v-autocomplete>
+                      </v-col>
+                    </v-row>
+                </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
                   <div class="single-product-content pa-5">
                       <v-row>
-                          <v-col md="4">
+                          <v-col md="6">
                             <VueSlickCarousel
                               ref="c1"
+                              :infinite = "images.length"
+                              :slidesToShow="1"
+                              slidesToScroll: 1,
                               :asNavFor="$refs.c2"
                               :focusOnSelect="true">
-                              <div v-for="(item,i) in images"
-                                :key="i"><img width="300" :src="item.src"></div>
+                              <div v-for="(image,i) in images"
+                                :key="i"><img :src="image.src"></div>
                             </VueSlickCarousel>
                             <VueSlickCarousel
                               ref="c2"
+                              :infinite = "thumbnail_images.length"
                               :asNavFor="$refs.c1"
                               :slidesToShow="4"
                               :focusOnSelect="true">
-                              <div v-for="(item,i) in images"
-                                :key="i"><img width="50" :src="item.src"></div>
+                              <div v-for="(item,j) in thumbnail_images"
+                                :key="j"><img :src="item.src"></div>
                             </VueSlickCarousel>
                             </v-col>
-                             <v-col md="8">
+                             <v-col md="6">
                                 <h2>{{name}}</h2><br>
                                 <h4>{{description}}</h4><br>
                                 <v-simple-table>
@@ -134,6 +157,9 @@ export default {
             products: [],
             total: 0,
             order_quantity: 0,
+            product_autocomplete: [],
+            business_name: null,
+            thumbnail_images: [],
         }
     }, 
     computed: {
@@ -148,17 +174,19 @@ export default {
         }
     },
     methods: {
-        validate() {
-            
-        }
-    },
-    created() {
-      if(this.$route.params.id) 
-      {
-          this.$store.dispatch('getProduct', this.$route.params.id)
+        searchProduct(id) 
+        {
+          console.log(id)
+          this.getProductDetails(id)
+        },
+        getProductDetails(id) {
+          this.$store.dispatch('getProduct', id)
           .then((res) => {
               if(res.data.data) {
-                console.log(res.data.data)
+                //console.log(res.data.data)
+                this.images = []
+                this.products = []
+                this.thumbnail_images = []
                 this.product_category = res.data.data[0].category,
                 this.product_sub_category = res.data.data[0].sub_category,
                 this.name = res.data.data[0].name,
@@ -168,9 +196,17 @@ export default {
                   this.tax_input = true 
                 for (let i = 0; i < res.data.data[0].photos.length; i++) {
                     this.images.push({
-                        src: res.data.data[0].photos[i].photo_url
+                        src: res.data.data[0].photos[i].big_image
                     }) 
                 }
+                for (let i = 0; i < res.data.data[0].photos.length; i++) {
+                    this.thumbnail_images.push({
+                        src: res.data.data[0].photos[i].thumbnail_image
+                    }) 
+                }
+                //console.log(this.images)
+                // this.thumbnail_images = res.data.data.thumbnail_image
+                // console.log(this.thumbnail_images)
                 for (let i = 0; i < res.data.data[0].units.length; i++) {
                   this.products.push({
                     unit: res.data.data[0].units[i].units,
@@ -190,6 +226,33 @@ export default {
               console.log(err)
           })
         }
+    },
+    created() {
+      if(this.$route.params.id) 
+      {
+        this.getProductDetails(this.$route.params.id)
+      }
+      
+      this.$store.dispatch('getProfile')
+          .then((response) => {
+          //console.log(res)
+          let user = response.data.data
+          this.logo = user.logo_url
+          this.business_name = `Search in ${user.business_name}`
+          //console.log(this.user_type)
+      
+      })
+      .catch(err => {
+        console.log(err)
+      })
+      this.$store.dispatch('getProducts')
+        .then((res_product_list) => {
+        this.product_autocomplete = res_product_list.data.data
+        //console.log(this.product_autocomplete);
+      })
+      .catch(err => {
+          console.log(err)
+      })
     },
     mounted() {
         //console.log(this.logo)

@@ -17,7 +17,7 @@
                         cols="3"
                         >
                         <v-card class="mb-5 mr-2">
-                            <div>
+                            <div @click="singleProduct(result.id)">
                               <v-img
                               :src="result.logo_url"
                               class="white--text align-end"
@@ -71,6 +71,10 @@ export default {
         
     },
     methods: {
+        singleProduct(id)
+        {
+          this.$router.push('/product-details/'+id)
+        },
         validate() {
             
         },
