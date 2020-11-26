@@ -3,7 +3,7 @@
     <v-main>
       <v-container
       >
-        <top-search-bar :mobile_number="mobile_number" :logo="logo"/>
+        <top-search-bar @onChangeAccountType="onChangeAccountType"/>
         <v-row justify="center">
           <v-col cols="12" sm="10" md="8" lg="12">
               <v-card>
@@ -51,7 +51,7 @@
                         :key="seller.id"
                         cols="3"
                         >
-                        <v-card class="mb-5 mr-2">
+                        <v-card class="mb-5 mr-2" link @click="shop_page(seller.id)">
                             <v-img
                             :src="seller.logo_url"
                             class="white--text align-end"
@@ -67,7 +67,7 @@
                         </v-col>
                     </v-row>
                   </div>
-                   <div v-else>
+                   <div v-else-if="seller">
                      <v-alert
                     dense
                     border="left"
@@ -108,7 +108,7 @@
                         :key="buyer.id"
                         cols="3"
                         >
-                        <v-card class="mb-5 mr-2">
+                        <v-card class="mb-5 mr-2" link>
                             <v-img
                             :src="buyer.logo_url"
                             class="white--text align-end"
@@ -121,6 +121,30 @@
                         </v-col>
                     </v-row>
                    </div>
+                    <div v-else>
+                      <v-card
+                        class="mx-auto"
+                        max-width="344"
+                        outlined
+                      >
+                        <v-card-actions>
+                          <v-btn
+                            outlined
+                            rounded
+                            text
+                          >
+                            View as Seller
+                          </v-btn>
+                          <v-btn
+                            outlined
+                            rounded
+                            text
+                          >
+                            View as Buyer
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </div>
                 </v-card-text>
                 <v-divider class="mt-12"></v-divider>
                 <v-card-actions>
@@ -153,6 +177,8 @@ export default {
             logo: null,
             valid:true,
             buyer: false,
+            seller:false,
+            buyer_seller: false,
             desserts: [
             {
               name: 'Sunil Traders',
@@ -175,19 +201,46 @@ export default {
         
     },
     methods: {
-        validate() {
-            
+      shop_page(id) {
+        this.$router.push('/my-shop/'+id)
+      },
+      validate() {
+          
+      },
+      onChangeAccountType() {
+        if(localStorage.getItem('user_account') == 'b') {
+          this.buyer = true
+          this.seller = false
         }
+        else if(localStorage.getItem('user_account') == 's') {
+          this.seller = true
+          this.buyer = false
+        }
+      },
     },
     created() {
       this.$store.dispatch('getProfile')
           .then((res) => {
-          //console.log(res.data.data)
+          console.log(res.data.data)
           let user = res.data.data
           if(user.user_type == 'b')
-              this.buyer = true
-          //console.log(this.user_type)
-      
+            this.buyer = true
+          if(user.user_type == 's')
+            this.seller = true
+          if(user.user_type == 'bs')
+            this.buyer_seller = true
+          //console.log(localStorage.getItem('user_account'))
+          if(user.user_type == 'bs' &&  localStorage.getItem('user_account') == null)
+          {
+            console.log('hello')
+            this.$router.push('/view-as-seller-buyer')
+          }
+          if(localStorage.getItem('user_account') == 'b') {
+            this.buyer = true
+          }
+          else if(localStorage.getItem('user_account') == 's') {
+            this.seller = true
+          }
       })
       .catch(err => {
         console.log(err)
@@ -211,8 +264,11 @@ export default {
         console.log(err)
       })
     },
+    watch() {
+
+    },
     mounted() {
-        //console.log(this.logo)
+        //console.log(localStorage.getItem('user_account'))
         
     }
 }

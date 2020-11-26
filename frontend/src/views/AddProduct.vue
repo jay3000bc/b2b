@@ -64,11 +64,16 @@
                         label="Tax"
                         placeholder="Tax"
                     ></v-text-field>
+                    <label for="">Is this item grouped ?</label>
+                    <v-radio-group v-model="is_item_grouped" row>
+                        <v-radio label="Yes" value="yes" @mousedown="add_unit_input=true"></v-radio>
+                        <v-radio label="No" value="no" @mousedown="add_unit_input=false"></v-radio>
+                    </v-radio-group>
                     <label for="">Upload your product photo(s)</label>
-                    <image-gallery @onImageSelected ="onImageSelected($event)" v-model="showImageGallery"/>
+                    <image-gallery @onImageSelected ="onImageSelected($event)"/>
                     <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" @vdropzone-complete="afterComplete"></vue-dropzone>
                     <v-row class="mt-4" v-for="(product, index) in products" v-bind:key="index">
-                        <v-col :sm="unit_inputbox_length">
+                        <v-col :sm="unit_inputbox_length" v-if="add_unit_input">
                             <v-text-field
                                 outlined
                                 ref="unit"
@@ -133,7 +138,7 @@
                                 placeholder="Stock"
                             ></v-text-field>
                         </v-col>
-                        <v-col sm="1">
+                        <v-col sm="1" v-if="add_unit_input">
                           <v-btn v-show="index==0" v-on:click="addNewProductUnit" class="float-right" color="success" x-large><i class="fa fa-plus"></i></v-btn>
                           <v-btn v-show="index >= 1" v-on:click="removeProductUnit(index)" class="float-right" color="success" x-large><i class="fa fa-minus"></i></v-btn>
                         </v-col>
@@ -194,6 +199,8 @@ export default {
         product_name: null,
         product_description: null,
         is_taxable: 'no',
+        is_item_grouped: 'yes',
+        add_unit_input: true,
         tax: 0,
         tax_input: false,
         dropzoneOptions: {
@@ -272,6 +279,7 @@ export default {
               name: this.product_name,
               description: this.product_description,
               tax: this.tax,
+              is_item_grouped: this.is_item_grouped,
               product: this.products,
               product_images: this.product_images,
               selected_images: this.selected_images
@@ -321,6 +329,7 @@ export default {
               name: this.product_name,
               description: this.product_description,
               tax: this.tax,
+              is_item_grouped: this.is_item_grouped,
               product: this.products,
               product_images: this.product_images,
               selected_images: this.selected_images,
@@ -476,6 +485,11 @@ export default {
                 this.product_name = res.data.data[0].name,
                 this.product_description = res.data.data[0].description,
                 this.tax  = res.data.data[0].tax
+                this.is_item_grouped = res.data.data[0].is_item_grouped
+                if(res.data.data[0].is_item_grouped == 'yes')
+                  this.add_unit_input = true
+                else
+                  this.add_unit_input = false
                 if(res.data.data[0].tax)
                   this.tax_input = true 
                 for (let i = 0; i < res.data.data[0].photos.length; i++) {

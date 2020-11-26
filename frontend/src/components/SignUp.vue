@@ -203,7 +203,7 @@ export default {
             }
             this.$store.dispatch('verifyOTP', data)
             .then((res) => {
-                //console.log(res)
+                console.log(res)
                  switch (res.data.status) {
                     case 2:
                         this.$router.push('/profile')

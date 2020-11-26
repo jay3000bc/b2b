@@ -17,7 +17,7 @@
                         cols="3"
                         >
                         <v-card class="mb-5 mr-2">
-                            <div @click="singleProduct(result.id)">
+                            <a v-if="result.user_type" @click="shop(result.id)">
                               <v-img
                               :src="result.logo_url"
                               class="white--text align-end"
@@ -25,7 +25,18 @@
                               height="200px"
                               >
                               </v-img>
-                            </div>
+                            </a>
+                             <a v-else>
+                              <router-link id="no-background-hover" :ripple="false" class="mt-15" text :to="{ name: 'SingleProduct', params: { id: result.business_name.replace(' ', '-').toLowerCase() +'-'+result.id }}">
+                              <v-img
+                              :src="result.logo_url"
+                              class="white--text align-end"
+                              gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+                              height="200px"
+                              >
+                              </v-img>
+                              </router-link>
+                            </a>
                             <v-card-title class="ml-0 py-0 pt-2 subtitle-2" v-if="result.user_type">{{result.business_name}}</v-card-title>
                             <v-card-title class="ml-0 py-0 pt-2 subtitle-2" v-else>Sold by - {{result.business_name}}</v-card-title>
                             <v-card-title class="ml-0 py-0 pb-2 subtitle-2" v-if="result.state">{{result.state}}, {{result.city}}</v-card-title>
@@ -71,6 +82,9 @@ export default {
         
     },
     methods: {
+        shop(id){
+          this.$router.push('/my-shop/'+id)
+        },
         singleProduct(id)
         {
           this.$router.push('/product-details/'+id)

@@ -13,9 +13,9 @@
                         <img :src="logo" width="50" alt=""> 
                       </v-col>
                       <v-col cols="12" sm="3">
-                        <v-btn class="float-right mt-2">Order Quantity [{{totalQuantity}}]</v-btn>
+                        <v-btn v-if="is_buyer" class="float-right mt-2">Order Quantity [{{totalQuantity}}]</v-btn>
                       </v-col>
-                      <v-col cols="12" sm="4" class="float-right">
+                      <v-col cols="12" sm="4" class="float-right search-bar">
                          <v-autocomplete
                           :items="product_autocomplete"
                           outlined
@@ -23,6 +23,7 @@
                           item-value="id"
                           :placeholder="business_name"
                           @change="searchProduct"
+                          icon="false"
                         ></v-autocomplete>
                       </v-col>
                     </v-row>
@@ -59,15 +60,38 @@
                                     <template v-slot:default>
                                     <thead>
                                         <tr>
-                                            <th class="text-left">Available options</th>
+                                            <th class="text-left" v-if="is_buyer">Available options</th>
+                                            <th v-else>Product</th>
                                             <th class="text-left">Price</th>
-                                            <th class="text-left">Order Quantity</th>
+                                            <th v-if="!is_buyer">Status</th>
+                                            <th class="text-left"  v-if="is_buyer">Order Quantity</th>
+                                            <th v-else>In Stock</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="product in products" :key="product.name">
-                                            <td width="50%">{{ product.unit }}
+                                            <td width="50%" v-if="is_buyer">{{ product.unit }}
                                                 <v-chip
+                                                    class="ma-2"
+                                                    color="green"
+                                                    text-color="white"
+                                                    v-if="product.stock > 0"
+                                                    >
+                                                    Available ({{product.stock}})
+                                                </v-chip>
+                                                <v-chip
+                                                    class="ma-2"
+                                                    color="red"
+                                                    text-color="white"
+                                                    v-else-if="product.stock == 0"
+                                                    >
+                                                    Not available
+                                                    </v-chip>
+                                            </td>
+                                            <td v-else>{{ product.unit }}</td>
+                                            <td width="30%">&#x20B9; {{ product.mrp | formatPrice}}</td>
+                                            <th v-if="!is_buyer">
+                                               <v-chip
                                                     class="ma-2"
                                                     color="green"
                                                     text-color="white"
@@ -83,30 +107,34 @@
                                                     >
                                                     Not available
                                                     </v-chip>
-                                            </td>
-                                            <td width="30%">Rs. {{ product.mrp }}</td>
-                                            <td width="20%"><v-text-field
+                                            </th>
+                                            <td width="20%" v-if="is_buyer"><v-text-field
                                                 outlined
                                                 dense
                                                 ref="quantity"
                                                 v-model="product.quantity"
                                                 label="quantity"
                                                 placeholder="quantity"
+                                                @keyup="checkAvailability"
                                                 class="mt-4"
                                             ></v-text-field></td>
+                                            <td v-else>
+                                              <span v-if="product.stock != null ">{{product.stock}}</span>
+                                              <span v-else>NA</span>
+                                            </td>
                                         </tr>
                                     </tbody>
                                      <tfoot>
                                         <tr>
                                             <td colspan="3" class="pa-0 ma-0"><v-divider></v-divider></td>
                                         </tr>
-                                        <tr>
+                                        <tr v-if="is_buyer">
                                             <th class="text-left"></th>
                                             <th class="text-left">Total Qauntity</th>
                                             <th class="text-left">{{totalQuantity}}</th>
                                         </tr>
-                                        <tr>
-                                          <td colspan="3" class="text-right"><v-btn class="success">Confirm Order</v-btn></td>
+                                        <tr v-if="is_buyer">
+                                          <td colspan="3" class="text-right" @click="confirmOrder"><v-btn class="success">Confirm Order</v-btn></td>
                                         </tr>
                                     </tfoot>
                                     </template>
@@ -160,6 +188,12 @@ export default {
             product_autocomplete: [],
             business_name: null,
             thumbnail_images: [],
+            order_details: [],
+            product_id: null,
+            user_id: null,
+            is_buyer: true,
+            p_id: null,
+
         }
     }, 
     computed: {
@@ -167,6 +201,7 @@ export default {
         {
           let total = 0
           Object.keys(this.products).forEach(key => {
+            //if(parseInt(this.products[key].quantity) > 0 && parseInt(this.products[key].available) > parseInt(this.products[key].quantity))
               total = parseInt(total) + parseInt(this.products[key].quantity) // value of the current key
 
           })
@@ -174,63 +209,155 @@ export default {
         }
     },
     methods: {
-        searchProduct(id) 
-        {
-          console.log(id)
-          this.getProductDetails(id)
-        },
-        getProductDetails(id) {
-          this.$store.dispatch('getProduct', id)
-          .then((res) => {
-              if(res.data.data) {
-                //console.log(res.data.data)
-                this.images = []
-                this.products = []
-                this.thumbnail_images = []
-                this.product_category = res.data.data[0].category,
-                this.product_sub_category = res.data.data[0].sub_category,
-                this.name = res.data.data[0].name,
-                this.description = res.data.data[0].description,
-                this.tax  = res.data.data[0].tax
-                if(res.data.data[0].tax)
-                  this.tax_input = true 
-                for (let i = 0; i < res.data.data[0].photos.length; i++) {
-                    this.images.push({
-                        src: res.data.data[0].photos[i].big_image
-                    }) 
-                }
-                for (let i = 0; i < res.data.data[0].photos.length; i++) {
-                    this.thumbnail_images.push({
-                        src: res.data.data[0].photos[i].thumbnail_image
-                    }) 
-                }
-                //console.log(this.images)
-                // this.thumbnail_images = res.data.data.thumbnail_image
-                // console.log(this.thumbnail_images)
-                for (let i = 0; i < res.data.data[0].units.length; i++) {
-                  this.products.push({
-                    unit: res.data.data[0].units[i].units,
-                    code: res.data.data[0].units[i].code,
-                    mrp: res.data.data[0].units[i].mrp,
-                    rate: res.data.data[0].units[i].rate,
-                    moq: res.data.data[0].units[i].moq,
-                    available: res.data.data[0].units[i].available,
-                    stock: res.data.data[0].units[i].stock,
-                    quantity: 0
-                  })
-                  
-                }
+      checkAvailability()
+      {
+        Object.keys(this.products).forEach(key => {
+          //console.log(this.products[key].stock)
+          if(parseInt(this.products[key].stock) < parseInt(this.products[key].quantity))
+          {
+            this.$swal({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Order quantity exceeds the available quantity !',
+            });
+            this.products[key].quantity = 0
+          }
+        })
+      },
+      searchProduct(id) 
+      {
+        console.log(id)
+        this.getProductDetails(id)
+      },
+      getProductDetails(id) {
+        this.$store.dispatch('getProduct', id)
+        .then((res) => {
+            if(res.data.data) {
+              console.log(res.data.data)
+              this.images = []
+              this.products = []
+              this.thumbnail_images = []
+              this.product_id = res.data.data[0].id,
+              this.user_id = res.data.data[0].user_id,
+              this.product_category = res.data.data[0].category,
+              this.product_sub_category = res.data.data[0].sub_category,
+              this.name = res.data.data[0].name,
+              this.description = res.data.data[0].description,
+              this.tax  = res.data.data[0].tax
+              if(res.data.data[0].tax)
+                this.tax_input = true 
+              for (let i = 0; i < res.data.data[0].photos.length; i++) {
+                  this.images.push({
+                      src: res.data.data[0].photos[i].big_image
+                  }) 
               }
-          })
-          .catch(err => {
-              console.log(err)
-          })
+              for (let i = 0; i < res.data.data[0].photos.length; i++) {
+                  this.thumbnail_images.push({
+                      src: res.data.data[0].photos[i].thumbnail_image
+                  }) 
+              }
+              //console.log(this.images)
+              // this.thumbnail_images = res.data.data.thumbnail_image
+              // console.log(this.thumbnail_images)
+              for (let i = 0; i < res.data.data[0].units.length; i++) {
+                this.products.push({
+                  unit_id: res.data.data[0].units[i].id,
+                  unit: res.data.data[0].units[i].units,
+                  code: res.data.data[0].units[i].code,
+                  mrp: res.data.data[0].units[i].mrp,
+                  rate: res.data.data[0].units[i].rate,
+                  moq: res.data.data[0].units[i].moq,
+                  available: res.data.data[0].units[i].available,
+                  stock: res.data.data[0].units[i].stock,
+                  quantity: 0
+                })
+              }
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        })
+      },
+      confirmOrder()
+      {
+        var error = 0
+        //console.log(this.products)
+        for(let i = 0; i < this.products.length; i++)
+        {
+          if(this.products[i].quantity > 0)
+          {
+            this.order_details.push({
+              product_id: this.product_id,
+              seller_id: this.user_id,
+              product_unit_id: this.products[i].unit_id,
+              price: this.products[i].mrp,
+              quantity: this.products[i].quantity
+            })
+          }
+          else
+          {
+            error++
+            this.$swal({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Please enter the order quantity to confirm order !',
+            });
+          }
+
         }
+        if(error == 0) {
+            console.log(error)
+            let data =  {
+              order_details: this.order_details
+            }
+            this.$store.dispatch('createOrder', data)
+              .then((res) => {
+                switch (res.data.status) {
+                  case 2:
+                    this.valid = false;
+                    this.sending = false;
+                    this.$swal({
+                        icon: 'success',
+                        title: 'Congrats',
+                        text: 'Order is confirmed',
+                    });
+                    this.$router.go(-1)
+                    //this.$router.push('/list-product') 
+                    break;
+                  case 3:
+                    var error = ''
+                    for (const prop in res.data.data) {
+                      error += res.data.data[prop]
+                    }
+                    this.$swal({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: `${res.data.data.message}`,
+                    });
+                    break;
+                  case 4:
+                    this.$swal({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: `${error}`,
+                    });
+                    break;
+                  default:
+                  break;
+                }
+              })
+          }
+        console.log(this.order_details)
+      }
     },
     created() {
       if(this.$route.params.id) 
       {
-        this.getProductDetails(this.$route.params.id)
+        let arr = []
+        arr = this.$route.params.id.split('-');
+        console.log(arr)
+        this.p_id = arr.pop();
+        this.getProductDetails(this.p_id)
       }
       
       this.$store.dispatch('getProfile')
@@ -239,6 +366,10 @@ export default {
           let user = response.data.data
           this.logo = user.logo_url
           this.business_name = `Search in ${user.business_name}`
+          if(user.user_type != 'b')
+          {
+            this.is_buyer = false
+          }
           //console.log(this.user_type)
       
       })
@@ -262,6 +393,9 @@ export default {
 </script>
 
 <style>
+  .single-product .search-bar .v-input__icon.v-input__icon--append {
+    display: none;
+  } 
   .slick-slider:focus {
      outline: none;
   }

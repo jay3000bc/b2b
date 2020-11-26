@@ -11,7 +11,7 @@
                 md="6"
                 class="pl-4"
             > <v-card-title class="font-weight-black text-center d-block">
-                    Register As Seller
+                    Order is 
                 </v-card-title>
                 <v-card-text class="text-center">
                     If you are a bussiness brand, Distributor, Wholesaler - Register Here
@@ -33,7 +33,7 @@
                 </v-card-title>
                 <v-card-text class="text-center divider-right">
                     If you are in the retail bussiness and you buy products from Bussiness Brands, Distributors.
-                    wholesalers &amp; Distributor - Register Here
+                    wholesalers & Distributor - Register Here
                 </v-card-text>
                 <v-card-actions class="mb-3 text-center d-block">
                      <SignUp user_type="b"/>

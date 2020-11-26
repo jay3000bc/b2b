@@ -87,7 +87,7 @@ export default new Vuex.Store({
         commit('auth_request')
         axios({url: `${process.env.VUE_APP_APIURL}verifyotp`, data: user, method: 'POST' })
         .then(resp => {
-          //console.log(resp)
+          console.log(resp)
           const token = resp.data.token
           const user = resp.data.user
           localStorage.setItem('token', token)
@@ -291,6 +291,20 @@ export default new Vuex.Store({
         })
       })
     },
+    getSellerProducts({commit}, user_id) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getProducts/${user_id}`, method: 'GET' })
+        .then(resp => {
+          //console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
     getProducts({commit}) {
       return new Promise((resolve, reject) => {
         commit('auth_request')
@@ -463,6 +477,244 @@ export default new Vuex.Store({
         axios({url: `${process.env.VUE_APP_APIURL}updateUserType`, method: 'GET' })
         .then(resp => {
           //console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    createOrder({commit}, data) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}orders`, data: data, method: 'POST' })
+        .then(resp => {
+          //console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getOrders({commit}) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}orders`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getOrdersBySeller({commit}) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getOrdersBySeller`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getOrderByStatus({commit}) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getOrdersByStatus`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getOrderByStatusView({commit}) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getOrdersByStatusView`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    orderViewed({commit}) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}orderViewed`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    deleteOrder({commit}, id) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}deleteOrder/${id}`,  method: 'GET' })
+        .then(resp => {
+          //console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    sendMessage({commit}, data) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}messages`, data: data, method: 'POST' })
+        .then(resp => {
+          //console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getMessages({commit}) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}messages`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    updateMessageStatus({commit}, id) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}messages/${id}`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getMessageByOrder({commit}, id) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getMessageByOrder/${id}`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    updateAddress({commit}, data) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}updateAddress`, data: data, method: 'POST' })
+        .then(resp => {
+          //console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getAddressByOrder({commit}, id) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getAddressByOrder/${id}`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getDefaultAddress({commit}) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getDefaultAddress`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getLocation({commit}) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `http://ip-api.com/json`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getCategories({commit}) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getCategories`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getUser({commit}, id) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}users/${id}`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
           resolve(resp)
         })
         .catch(err => {

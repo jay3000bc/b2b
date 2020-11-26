@@ -26,7 +26,8 @@
                     <v-btn to="/list-product" class="text-center"><v-list-item-title>Products</v-list-item-title></v-btn>
                     <v-btn to="/image-gallery" class="text-center"><v-list-item-title>Image Gallery</v-list-item-title></v-btn>
                     <v-btn to="/buyers"><v-list-item-title class="text-center">Buyers</v-list-item-title></v-btn>
-                    <v-btn to="/orders" class="text-center"><v-list-item-title>Orders</v-list-item-title></v-btn>
+                    <v-btn  @click="orderView" class="text-center"><v-list-item-title>Orders <v-badge v-if="not_viewed_orders > 0" color="green" :content="not_viewed_orders" >
+                    </v-badge> </v-list-item-title></v-btn>
                     <v-btn to="/my-shop" class="text-center"><v-list-item-title>My Shop</v-list-item-title></v-btn>
                     <v-btn to="/become-buyer"  class="text-center" v-if="db_user_type==='s'"><v-list-item-title >Became a Buyer</v-list-item-title></v-btn>
                     <v-btn v-else-if="db_user_type='bs'" @click="viewAsBuyer"><v-list-item-title>Switch to Buyer</v-list-item-title></v-btn>
@@ -38,7 +39,7 @@
                     <v-btn to="/profile" class="text-center"><v-list-item-title >Profile</v-list-item-title></v-btn>
                     <v-btn to="/change-password" class="text-center"><v-list-item-title>Change Password</v-list-item-title></v-btn>
                     <v-btn class="text-center" to="/suppliers"><v-list-item-title>Suppliers</v-list-item-title></v-btn>
-                    <v-btn to="/order-history" class="text-center"><v-list-item-title>Order History</v-list-item-title></v-btn>
+                    <v-btn to="/my-orders" class="text-center"><v-list-item-title>My Orders</v-list-item-title></v-btn>
                     <v-btn  to="/become-seller" class="text-center" v-if="db_user_type==='b'"><v-list-item-title >Became a Seller</v-list-item-title></v-btn>
                     <v-btn v-else-if="db_user_type==='bs'" @click="viewAsSeller"><v-list-item-title>Switch to Seller</v-list-item-title></v-btn>
                     <v-btn to="/help-support" class="text-center"><v-list-item-title>Help &amp; Support</v-list-item-title></v-btn>
@@ -64,8 +65,7 @@
             class="top-navigation"
             >
 
-            <v-btn text small v-if="logo"><img :src="logo" width="50" alt=""></v-btn>
-            <v-btn text small v-else>logo</v-btn>
+            <v-btn text small to="/dashboard"><img src="@/assets/b2b_logo.png" width="40" alt=""></v-btn>
             </v-col>
             <v-col
             cols="12"
@@ -117,6 +117,8 @@
     name: 'TopSearchBar',
     data () {
         return {
+                not_viewed_orders: 0,
+                pending_orders_count: 0,
                 loading: false,
                 items: [],
                 search: null,
@@ -182,13 +184,27 @@
         },
     },
     methods: {
+        orderView() {
+            this.$store.dispatch('orderViewed')
+            .then(() => {
+            this.not_viewed_orders = 0
+            this.$router.push('/orders')
+            //console.log(res.data.data[0].product.units[0].photos[0])
+
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
         viewAsBuyer() {
             this.user_type1 = 'b'
             localStorage.setItem('user_account', 'b')
+            this.$emit('onChangeAccountType', this.user_type1)
         },
         viewAsSeller() {
             this.user_type1 = 's'
             localStorage.setItem('user_account', 's')
+            this.$emit('onChangeAccountType', this.user_type1)
         },
         onChange(e) {
             if (typeof e === "undefined") { return;}
@@ -226,12 +242,12 @@
     },
     created() {
         if(this.$route.params.search_key){
-            console.log(this.$route.params.search_key)
+            //console.log(this.$route.params.search_key)
             this.select = this.$route.params.search_key
         }
         this.$store.dispatch('getProfile')
             .then((res) => {
-            console.log(res)
+            //console.log(res)
             let user = res.data.data
             this.business_name = user.business_name
             this.mobile_number = user.mobile_number
@@ -253,9 +269,29 @@
           console.log(err)
         })
 
+        this.$store.dispatch('getOrderByStatus')
+        .then((res) => {
+          this.pending_orders_count = res.data.data.length
+          //console.log(res.data.data[0].product.units[0].photos[0])
+
+        })
+        .catch(err => {
+            console.log(err)
+        })
+
+        this.$store.dispatch('getOrderByStatusView')
+        .then((res) => {
+          this.not_viewed_orders = res.data.data.length
+          //console.log(res.data.data[0].product.units[0].photos[0])
+
+        })
+        .catch(err => {
+            console.log(err)
+        })
+
     },
     mounted() {
-        console.log(localStorage.getItem('user_account'))
+        //console.log(localStorage.getItem('user_account'))
     }
   }
 </script>

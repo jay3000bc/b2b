@@ -110,8 +110,15 @@ export default {
                     case 2:
                         if(res.data.data.status == 0)
                             this.$router.push('/profile')
-                        else
+                        else if(res.data.data.user_type == 'bs')
+                        {
+                            this.$router.push('/view-as-seller-buyer')
+                        }
+                        else 
+                        {
                             this.$router.push('/dashboard')
+                        }
+                            
                         break;
                     case 3:
                         this.sending = false;

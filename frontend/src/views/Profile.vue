@@ -15,6 +15,7 @@
                 <v-card-title>Profile</v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
+                  <v-card-title class="pl-0 mb-2" v-if="business_category">Business Category: {{ business_category }}</v-card-title>
                   <v-text-field
                     outlined
                     ref="business_name"
@@ -27,6 +28,7 @@
                     autofocus
                   ></v-text-field>
                   <v-autocomplete
+                    v-if="business_category == null"
                     outlined
                     ref="business_category"
                     v-model="business_category"
@@ -176,7 +178,7 @@
                       <span>Refresh form</span>
                     </v-tooltip>
                   </v-slide-x-reverse-transition>
-                  <v-btn :disabled="!valid" color="primary" text @click="validate">Submit</v-btn>
+                  <v-btn :disabled="!valid" color="primary" text @click="validate">Update</v-btn>
                 </v-card-actions>
               </v-card>
             </v-form>
@@ -204,6 +206,7 @@ export default {
   },
  data () {
     return {
+      location: null,
       user: null,
       data: '',
       valid: true,
@@ -275,7 +278,8 @@ export default {
       profile_update: false,
       user_type: null,
       other_type: false,
-      others: null
+      others: null,
+      business_category_disabled: false
     }
   }, 
   computed: {
@@ -365,14 +369,26 @@ export default {
         })
       }
     },
-    change_business_category() {
-      if(this.user_type == 'b')
+    change_business_category(e) {
+      if(this.user_type == 'b' && e == 'Others')
       {
+        //console.log(e)
         this.other_type =  true
+      }
+      else
+      {
+        this.other_type =  false
       }
     },
   },
   created() {
+    this.$store.dispatch('getLocation')
+        .then((response) => {
+        this.country = response.data.country;
+    })
+    .catch(err => {
+      console.log(err)
+    })
     this.$store.dispatch('getProfile')
       .then((res) => {
         this.user = res.data.data
@@ -395,7 +411,10 @@ export default {
             this.contacts.push({one: this.contact_numbers[i]});
         }
         if(this.user.status == 1)
+        {
           this.profile_update = true
+          this.business_category_disabled = true
+        }
         if(this.state != null)
           this.change_state();
         this.city = this.user.city
@@ -403,7 +422,7 @@ export default {
         {
           this.business_categories.push('Others')
           this.user_type = this.user.user_type
-          this.other_type =  true
+          //this.other_type =  true
           this.others = this.user.other
         }
       })
@@ -412,7 +431,6 @@ export default {
       })
     },
     mounted() {
-      //console.log(process.env.VUE_APP_GARMENTS)
       
     }
 }

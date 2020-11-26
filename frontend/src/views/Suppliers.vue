@@ -16,7 +16,8 @@
                         :key="supplier.id"
                         cols="3"
                         >
-                        <v-card class="mb-5 mr-2">
+                        <a @click="shop_page(supplier.id)">
+                          <v-card class="mb-5 mr-2">
                             <v-img
                             :src="supplier.logo_url"
                             class="white--text align-end"
@@ -26,6 +27,7 @@
                             </v-img>
                             <v-card-title class="justify-center caption">{{supplier.business_name}}<br>{{supplier.city}}, {{supplier.state}} </v-card-title>
                         </v-card>
+                        </a>
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -64,6 +66,9 @@ export default {
         
     },
     methods: {
+      shop_page(id) {
+        this.$router.push('/my-shop/'+id)
+      }
     },
     created() {
       this.$store.dispatch('getSellers')

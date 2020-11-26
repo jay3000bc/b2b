@@ -4,7 +4,7 @@ import store from '../store/index.js'
 import Home from '../views/Home.vue'
 import Profile from '../views/Profile.vue'
 import Preferences from '../views/Preferences.vue'
-import Dashboard from '../views/dashboard.vue'
+import Dashboard from '../views/Dashboard.vue'
 import AddProduct from '../views/AddProduct.vue'
 import ListProduct from '../views/ListProduct.vue'
 import ImageGallary from '../views/ImageGallery.vue'
@@ -18,8 +18,10 @@ import Suppliers from '../views/Suppliers.vue'
 import BecomeBuyer from '../views/BecomeBuyer.vue'
 import BecomeSeller from '../views/BecomeSeller.vue'
 import HelpSupport from '../views/HelpSupport.vue'
-import OrderHistory from '../views/OrderHistory.vue'
+import MyOrders from '../views/MyOrders.vue'
 import Orders from '../views/Orders.vue'
+import Messages from '../views/Messages.vue'
+import ViewAsSellerBuyer from '../views/ViewAsSellerBuyer.vue'
 
 
 
@@ -110,6 +112,14 @@ Vue.use(VueRouter)
     },
   },
   {
+    path: '/my-shop/:id',
+    name: 'MyShop',
+    component: MyShop,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
     path: '/change-password',
     name: 'ChangePassword',
     component: ChangePassword,
@@ -158,9 +168,9 @@ Vue.use(VueRouter)
     },
   },
   {
-    path: '/order-history',
-    name: 'OrderHistory',
-    component: OrderHistory,
+    path: '/my-orders',
+    name: 'MyOrders',
+    component: MyOrders,
     meta: { 
       requiresAuth: true
     },
@@ -181,10 +191,36 @@ Vue.use(VueRouter)
       requiresAuth: true
     },
   },
+  {
+    path: '/messages',
+    name: 'Messages',
+    component: Messages,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/messages/:id',
+    name: 'Messages',
+    component: Messages,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/view-as-seller-buyer',
+    name: 'ViewAsSellerBuyer',
+    component: ViewAsSellerBuyer,
+    meta: { 
+      requiresAuth: true
+    },
+  },
+
 ]
 
 const router = new VueRouter({
   mode: 'history',
+  //mode: '#',
   //base: process.env.BASE_URL,
   base: '/mukesh/b2b/',
   routes

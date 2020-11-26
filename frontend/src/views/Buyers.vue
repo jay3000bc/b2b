@@ -69,7 +69,7 @@ export default {
       this.$store.dispatch('getBuyers')
           .then((res) => {
             this.buyers = res.data.data
-          //console.log(res.data.data)
+            console.log(res.data.data)
 
         })
       .catch(err => {

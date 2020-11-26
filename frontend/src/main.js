@@ -8,7 +8,7 @@ import Axios from 'axios'
 import OtpInput from "@bachdgvn/vue-otp-input";
 import VueSweetalert2 from 'vue-sweetalert2';
 import VueCookies from 'vue-cookies'
-
+import moment from 'moment'
 
 Vue.prototype.$http = Axios;
 const token = localStorage.getItem('token')
@@ -35,7 +35,21 @@ Vue.prototype.$apiURI = `http://${process.env.VUE_APP_HOST}/public`;
 
 
 
+
 Vue.use(VueCookies)
+
+Vue.filter('formatDate', function(value) {
+  if (value) {
+    return moment(String(value)).format('DD/MM/YYYY')
+  }
+});
+
+Vue.filter('formatPrice', function(value) {
+  if (value) {
+    let val = (value/1).toFixed(2).replace(',', '.')
+    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  }
+});
 
 new Vue({
   router,

@@ -12,6 +12,7 @@
     "@bachdgvn/vue-otp-input": "^1.0.8",
     "axios": "^0.19.2",
     "core-js": "^3.6.5",
+    "moment": "^2.29.1",
     "swiper": "^6.2.0",
     "vue": "^2.6.11",
     "vue-awesome-swiper": "^4.1.1",

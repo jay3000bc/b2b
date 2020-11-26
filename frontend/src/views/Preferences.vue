@@ -147,6 +147,30 @@
                     </v-row>
                      <v-row>
                         <v-col cols="12" sm="3" md="3" lg="3" class="pt-0"> 
+                            Categories options
+                        </v-col>
+                        <v-col cols="12" sm="7" md="7" lg="7" class="mb-3">
+                            <v-chip 
+                                v-show="index <= category_to_show"
+                                @click="addOptionalCategory(optional_category.name)"
+                                class="mr-2"
+                                link
+                                v-for="(optional_category, index ) in optional_categories" 
+                                :key="optional_category.id">
+                                <v-icon left>
+                                mdi-plus
+                                </v-icon>
+                                {{optional_category.name}}
+                            </v-chip>
+                            <a text v-show="category_to_show < total_categories_count" @click="category_to_show += 5">see more...</a>
+                            <a text v-show="category_to_show > total_categories_count" @click="category_to_show -= 5">see less...</a>
+                         </v-col>
+                        <v-col cols="12" sm="2" md="2" lg="2" class="pt-0">
+                            
+                        </v-col>
+                    </v-row>
+                     <v-row>
+                        <v-col cols="12" sm="3" md="3" lg="3" class="pt-0"> 
                         </v-col>
                         <v-col cols="12" sm="7" md="7" lg="7" class="pt-0">
                              <v-combobox multiple
@@ -239,7 +263,10 @@ export default {
             customer_types: ['Only Retailers', 'Individual Customer', 'Both'],
             options_yes_no: ['yes', 'no'],
             items: [],
-            search: "" //sync search
+            search: "", //sync search
+            optional_categories: [],
+            category_to_show: 0,
+            total_categories_count: 0,
         }
     }, 
     computed: {
@@ -312,9 +339,33 @@ export default {
                 this.search = "";
                 });
             });
-    }
+        },
+        addOptionalCategory(category) {
+            if(this.categories.includes(category))
+            {
+                this.$swal({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Category already selected',
+                });
+            }
+            else
+            {
+                this.categories.push(category);
+            }
+            //this.categories.push(category);
+        }
     },
     created() {
+        this.$store.dispatch('getCategories')
+            .then((response) => {
+                console.log(response)
+                this.optional_categories = response.data.data
+                this.total_categories_count = this.optional_categories.length
+        })
+        .catch(err => {
+            console.log(err)
+        })
         this.$store.dispatch('getPreferences')
         .then((res) => {
             if(res.data.data) {

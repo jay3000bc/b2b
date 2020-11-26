@@ -13,8 +13,7 @@
             md="8"
             class="top-navigation"
           >
-            <v-btn text small v-if="logo"><img :src="logo" width="50" alt=""></v-btn>
-            <v-btn text small v-else>logo</v-btn>
+            <v-btn text small to="/dashboard"><img src="@/assets/b2b_logo.png" width="40" alt=""></v-btn>
           </v-col>
           <v-spacer></v-spacer>
           <v-col
@@ -84,7 +83,7 @@ export default {
       showResetPassword: false,
       user: '',
       logo: '',
-      token: '',
+      token: ''
     }
   },
   methods: {

@@ -39,12 +39,15 @@
                             height="200px"
                             >
                             </v-img>
-                            <v-card-title v-text="product.name" class="justify-center"></v-card-title>
+                            <v-card-title style="white-space:nowrap" v-text="product.name" class="justify-center ml-0 py-0 pt-2 mb-2 subtitle-2"></v-card-title>
                             <v-card-actions class="justify-center pt-0 pb-6">
-                                <v-btn class="success" :to="{ name: 'SingleProduct', params: { id: product.id }}"> View Options</v-btn>
+                                <v-btn small class="success" :to="{ name: 'SingleProduct', params: { id: product.name.replace(' ', '-').toLowerCase() +'-'+ product.id }}"> View Options</v-btn>
                             </v-card-actions>
                         </v-card>
                         </v-col>
+                         <v-col class="mb-5 text-center" v-show="products.length == 0">
+                          <p>Products not available !</p>
+                       </v-col>
                     </v-row>
                   </div>
                 </v-card-text>
@@ -80,6 +83,7 @@ export default {
             business_name: null,
             products: [],
             searchQuery: null,
+            user_id: null,
         }
     }, 
     computed: {
@@ -99,33 +103,61 @@ export default {
         }
     },
     created() {
-       this.$store.dispatch('getProducts')
-        .then((res) => {
-        console.log(res.data.data);
-        
-        this.products = res.data.data
-        //console.log(this.products[0].photos[0].photo_url);
-      })
-      .catch(err => {
-          console.log(err)
-      })
-
-      this.$store.dispatch('getProfile')
+        if(this.$route.params.id) 
+        {
+          this.$store.dispatch('getUser', this.$route.params.id)
+            .then((res) => {
+            //console.log(res.data)
+            let user = res.data.user
+            this.logo = user.logo_url
+            this.user_id = user.id
+            this.business_name = `Search in ${user.business_name}`
+          })
+          .catch(err => {
+            console.log(err)
+          })
+          this.$store.dispatch('getSellerProducts', this.$route.params.id)
+            .then((res) => {
+            console.log(res.data.status);
+            
+            this.products = res.data.data
+            //console.log(this.products[0].photos[0].photo_url);
+          })
+          .catch(err => {
+              console.log(err)
+          })
+        }
+        else
+        {
+          this.$store.dispatch('getProfile')
             .then((res) => {
             //console.log(res)
             let user = res.data.data
             this.logo = user.logo_url
+            this.user_id = user.id
             this.business_name = `Search in ${user.business_name}`
             //console.log(this.user_type)
         
-        })
-        .catch(err => {
-          console.log(err)
-        })
+          })
+          .catch(err => {
+            console.log(err)
+          })
+
+          this.$store.dispatch('getProducts')
+            .then((res) => {
+            console.log(res.data.data);
+            
+            this.products = res.data.data
+            //console.log(this.products[0].photos[0].photo_url);
+          })
+          .catch(err => {
+              console.log(err)
+          })
+        }
 
     },
     mounted() {
-        //console.log(this.logo)
+        //console.log(this.$route.params.id)
         
     }
 }
