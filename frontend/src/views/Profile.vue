@@ -117,22 +117,25 @@
                     <v-list-item class="ma-0 pa-0">
                       <v-text-field
                         outlined
+                        @change="onChangePhoneNumber"
                         ref="mobile_number"
                         v-model="mobile_number"
                         label="Contact numbers *"
-                        :disabled="true"
+                        :rules="[() => !! mobile_number || 'This field is required',
+                        () => !! mobile_number && /[0-9]/.test(mobile_number) || 'Contact number must be integer'
+                        ]"
                       ></v-text-field>
-                      <v-btn @click="addRow" class="ml-2 mb-7 float-right" color="success" x-large><i class="fa fa-plus"></i></v-btn>
+                      <v-btn :class="[contacts.length == 2 ? 'gray' : 'success']" @click="addRow" class="ml-2 mb-7 float-right" x-large><i class="fa fa-plus"></i></v-btn>
                     </v-list-item>
                   </v-list>
                   <v-list class="ma-0 pa-0">
                     <v-list-item class="ma-0 pa-0" v-for="(contact, index) in contacts" :key="index">
                       <v-text-field
                         outlined
+                        @change="onAddNewPhoneNumber"
                         ref="contact.one"
                         v-model="contact.one"
                         :rules="[() => !! contact.one || 'This field is required',
-                        () => !! contact.one && contact.one.length ==  10 || 'Contact number must not be less than 10 digits',
                         () => !! contact.one && /[0-9]/.test(contact.one) || 'Contact number must be integer'
                         ]"
                         label="Contact numbers *"
@@ -179,6 +182,7 @@
                     </v-tooltip>
                   </v-slide-x-reverse-transition>
                   <v-btn :disabled="!valid" color="primary" text @click="validate">Update</v-btn>
+                  <VerifyOtp v-model="show" :mobile_number="mobile_number_update" :mobile_number_type="mobile_number_type"/>
                 </v-card-actions>
               </v-card>
             </v-form>
@@ -196,16 +200,19 @@ import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 // @ is an alias to /src
 import Footer from '@/components/Footer.vue'
 import TopSearchBar from '@/components/TopSearchBar.vue'
+import VerifyOtp from '../components/VerifyOtp.vue'
 
 export default {
   name: 'Profile',
   components: {
     Footer,
     TopSearchBar,
-    vueDropzone
+    vueDropzone,
+    VerifyOtp
   },
  data () {
     return {
+      show: false,
       location: null,
       user: null,
       data: '',
@@ -279,7 +286,8 @@ export default {
       user_type: null,
       other_type: false,
       others: null,
-      business_category_disabled: false
+      business_category_disabled: false,
+      mobile_number_type: 'old'
     }
   }, 
   computed: {
@@ -288,6 +296,73 @@ export default {
     },
   },
   methods: {
+    onChangePhoneNumber() {
+
+      //alert('Hello')
+      this.mobile_number_update = this.mobile_number
+      if(this.mobile_number_update.length == 10)
+      {
+        this.$store.dispatch('changeMobileNumber', this.mobile_number)
+        .then((res) => {
+          switch (res.data.status) {
+                case 2:
+                  this.show = true
+                  break;
+                case 3:
+                  this.$swal({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: `${res.data.message}`,
+                  });
+                  break;
+                default:
+                break;
+            }
+        })
+        .catch(err => {
+          // console.log(err)
+          this.$swal({
+              icon: 'error',
+              title: 'Oops...',
+              text: err,
+          });
+        })
+      }
+    },
+    onAddNewPhoneNumber(e) {
+      //alert('Hello')
+      this.mobile_number_type = 'new'
+      this.mobile_number_update = e
+      console.log(this.mobile_number_update.length)
+      if(this.mobile_number_update.length == 10)
+      {
+        this.$store.dispatch('changeMobileNumber', e)
+        .then((res) => {
+          switch (res.data.status) {
+                case 2:
+                  this.show = true
+                  break;
+                case 3:
+                  this.$swal({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: `${res.data.message}`,
+                  });
+                  break;
+                default:
+                break;
+            }
+        })
+        .catch(err => {
+          // console.log(err)
+          this.$swal({
+              icon: 'error',
+              title: 'Oops...',
+              text: err,
+          });
+        })
+      }
+    },
     addRow() {
       if(Object.keys(this.contacts).length < 2)
       {
@@ -297,8 +372,46 @@ export default {
       }
     },
     deleteRow(index) {
-      this.contacts.splice(index,1)
       //this.contact_numbers.splice(index, 1);
+      let data = {
+          mobile_number: this.contacts[index].one
+      }
+      if(this.contacts[index].one.length == 10)
+      {
+        this.$store.dispatch('deleteMobileNumber', data)
+          .then((res) => {
+            switch (res.data.status) {
+                  case 2:
+                    this.contacts.splice(index,1)
+                    break;
+                  case 3:
+                    var error = ''
+                    for (const prop in res.data.data) {
+                      error += res.data.data[prop]
+                    }
+                    this.$swal({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: `${error}`,
+                    });
+                    break;
+                  default:
+                  break;
+              }
+          })
+          .catch(err => {
+            // console.log(err)
+            this.$swal({
+                icon: 'error',
+                title: 'Oops...',
+                text: err,
+            });
+          })
+      }
+      else
+      {
+        this.contacts.splice(index,1)
+      }
     },
     validate () {
       if(this.$refs.form.validate())
@@ -329,27 +442,52 @@ export default {
           gst: this.gst,
           email: this.email,
           logo: this.logo,
-          others: this.others
+          others: this.others,
+          mobile_number: this.mobile_number
 
       }
       this.$store.dispatch('profileUpdate', data)
       .then((res) => {
         this.profile_update = true
-        console.log(res)
-        this.$swal({
-            icon: 'success',
-            title: 'Congrats',
-            text: 'Profile updated successfully',
-        });
-      })
-      .catch(err => {
-         // console.log(err)
-         this.$swal({
-            icon: 'error',
-            title: 'Oops...',
-            text: err,
-        });
-      })
+         switch (res.data.status) {
+                case 2:
+                  this.$swal({
+                      icon: 'success',
+                      title: 'Congrats',
+                      text: 'Profile updated successfully',
+                  });
+                  break;
+                case 3:
+                  var error = ''
+                  for (const prop in res.data.data) {
+                    error += res.data.data[prop]
+                  }
+                  this.$swal({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: `${error}`,
+                  });
+                  break;
+                case 4:
+                  this.$swal({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: `${res.data.message}`,
+                  });
+                  break;
+                default:
+                break;
+            }
+
+          })
+          .catch(err => {
+            console.log(err)
+            this.$swal({
+                icon: 'error',
+                title: 'Oops...',
+                text: `${err}`,
+            });
+          })
     },
     change_state() {
       //console.log(this.state)

@@ -28,7 +28,7 @@
                         ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="12" md="12" class="pt-0 pb-0">
-                        <div v-if="$v.form.newPassword">
+                        <div v-if="$v.form.newPassword.$dirty">
                             <span class="red--text" v-if="!$v.form.newPassword.required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> The new password is required</span>
                             <span class="red--text" v-else-if="!$v.form.newPassword.minLength"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid password</span>
                         </div>
@@ -38,7 +38,20 @@
                             label="Enter new password"
                             outlined
                             type="password"
-                            v-model="form.newPassword"
+                            v-model.trim="$v.form.newPassword.$model"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="12" md="12" class="pt-0 pb-0">
+                        <div>
+                            <span class="red--text" v-if="!$v.form.confirmPassword.sameAsPassword"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Passwords must be identical.</span>
+                        </div>
+                        <v-text-field
+                            :disabled="sending"
+                            class="mt-2"
+                            label="Confirm new password"
+                            outlined
+                            type="password"
+                            v-model="form.confirmPassword"
                         ></v-text-field>
                     </v-col> 
                     <v-col cols="12">
@@ -73,7 +86,8 @@ import Footer from '@/components/Footer.vue'
 import TopSearchBar from '@/components/TopSearchBar.vue'
 import {
     required,
-    minLength
+    minLength,
+    sameAs
   } from 'vuelidate/lib/validators';
 
 export default {
@@ -87,6 +101,7 @@ export default {
             form: {
               currentPassword: null,
               newPassword: null,
+              confirmPassword: null,
             },
             sending: false,
         }
@@ -97,9 +112,12 @@ export default {
               required,
               minLength: minLength(6)
           },
-          newpassword: {
+          newPassword: {
               required,
               minLength: minLength(6)
+          },
+          confirmPassword: {
+            sameAsPassword: sameAs('newPassword')
           }
         }
     },
@@ -111,7 +129,8 @@ export default {
         this.sending = true;
         let data = {
             currentPassword: this.form.currentPassword,
-            newPassword: this.form.newPassword
+            newPassword: this.form.newPassword,
+            newPassword_confirmation: this.form.confirmPassword
         }
         this.$store.dispatch('saveChangePassword', data)
           .then((res) => {
@@ -128,15 +147,17 @@ export default {
                   });
                   break;
                 case 3:
-                    this.sending = false;
-                    this.$swal({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: `${res.data.message}`,
-                    });
-                    this.form.mobile_number = '';
-                    this.form.password = '';
-                    break;
+                  var error = ''
+                  for (const prop in res.data.data) {
+                    error += `${res.data.data[prop]}<br />`;
+                  }
+                  this.$swal({
+                      html:error,
+                      icon: 'error',
+                      title: 'Oops...'
+                  });
+                   this.sending = false;
+                  break;
                 default:
                 break;
             }

@@ -49,7 +49,9 @@ export default {
     props: {
         value: Boolean,
         order_id: Number,
-        seller_id: Number
+        seller_id: Number,
+        user_type: String,
+        message_type: String
 
     },
     computed: {
@@ -67,14 +69,16 @@ export default {
             this.$emit('showSendMessage')
         },
         sendMessage() {
-            console.log(this.order_id)
+            console.log(this.user_type)
             if(this.message == null)
                 return false;
             this.sending = true;
             let data = {
+                message_type: this.message_type,
                 message: this.message,
                 seller_id: this.seller_id,
-                order_id: this.order_id
+                order_id: this.order_id,
+                user_type: this.user_type
             }
             this.$store.dispatch('sendMessage', data)
             .then((res) => {

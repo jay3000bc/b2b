@@ -152,18 +152,18 @@
                         <v-col cols="12" sm="7" md="7" lg="7" class="mb-3">
                             <v-chip 
                                 v-show="index <= category_to_show"
-                                @click="addOptionalCategory(optional_category.name)"
-                                class="mr-2"
+                                @click="addOptionalCategory(optional_category)"
+                                class="mr-2 mb-2"
                                 link
-                                v-for="(optional_category, index ) in optional_categories" 
-                                :key="optional_category.id">
+                                v-for="(optional_category, index ) in resultQuery" 
+                                :key="optional_category">
                                 <v-icon left>
                                 mdi-plus
                                 </v-icon>
-                                {{optional_category.name}}
+                                {{optional_category}}
                             </v-chip>
-                            <a text v-show="category_to_show < total_categories_count" @click="category_to_show += 5">see more...</a>
-                            <a text v-show="category_to_show > total_categories_count" @click="category_to_show -= 5">see less...</a>
+                            <a text v-show="resultQuery.length > category_to_show" @click="category_to_show += (resultQuery.length-category_to_show > 0) ? (resultQuery.length-category_to_show) : (category_to_show-resultQuery.length)">see more...</a>
+                            <a text v-show="category_to_show == resultQuery.length" @click="category_to_show -= resultQuery.length -25">see less...</a>
                          </v-col>
                         <v-col cols="12" sm="2" md="2" lg="2" class="pt-0">
                             
@@ -265,12 +265,16 @@ export default {
             items: [],
             search: "", //sync search
             optional_categories: [],
-            category_to_show: 0,
-            total_categories_count: 0,
+            category_to_show: 25,
         }
     }, 
     computed: {
-        
+        resultQuery(){
+           let difference = this.optional_categories.filter(x => ! this.categories.includes(x))
+           console.log(difference)
+           return difference
+        },
+
     },
     methods: {
         preferenceUpdate() {
@@ -359,9 +363,8 @@ export default {
     created() {
         this.$store.dispatch('getCategories')
             .then((response) => {
-                console.log(response)
+                console.log(response.data.data)
                 this.optional_categories = response.data.data
-                this.total_categories_count = this.optional_categories.length
         })
         .catch(err => {
             console.log(err)
@@ -388,7 +391,7 @@ export default {
         })
     },
     mounted() {
-        //console.log(this.logo)
+        console.log(this.category_to_show-this. resultQuery.length)
         
     }
 }

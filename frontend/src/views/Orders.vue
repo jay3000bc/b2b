@@ -23,7 +23,14 @@
                           :key="order.id"
                           >
                           <v-col cols="12" md="3">
-                            <v-btn id="no-background-hover" :ripple="false" class="mt-15" text :to="{ name: 'SingleProduct', params: { id: order.product.name.replace(' ', '-').toLowerCase() +'-'+order.product.id }}"><v-img :src="order.product.units[0].photos[0].photo_url" width="200"></v-img></v-btn>
+                            <v-btn id="no-background-hover" :ripple="false" class="mt-15" text :to="{ name: 'SingleProduct', params: { id: order.product.name.replace(' ', '-').toLowerCase() +'-'+order.product.id }}">
+                              <div v-if="order.product.units[0].photos">
+                                <v-img :src="order && order.product.units[0].photos[0] ? order.product.units[0].photos[0].photo_url : null" width="200"></v-img>
+                              </div>
+                              <div v-else>
+                               <v-img src="@/assets/no-image.png" width="200" alt="no-image"></v-img>
+                              </div>
+                            </v-btn>
                           </v-col>
                           <v-col cols="12" md="3">
                             <v-card-subtitle class="subtitle-2 text-blue font-weight-bold blue--text darken-2 mb-0 pb-0 mt-10">{{order.product.name}}</v-card-subtitle>
@@ -45,17 +52,19 @@
                             <v-card-subtitle class="pb-0 pt-0">{{order.buyer[0].city}} - {{order.buyer[0].zip}}</v-card-subtitle>
                           </v-col>
                             <v-col cols="12" md="3">
-                              <ItemShipping v-model="showItemShipping" :order_id="order.id" :seller_id="order.user.id"/>
+                              <ItemShipping @update_orders="update_orders" message_type="o" v-model="showItemShipping" :user_type="dialog_user_type" :order_id="dialog_order_id" :user_id="dialog_user_id"/>
                               <v-btn
                                 block
                                 color="primary mt-10"
-                                @click.stop="showItemShipping=true"
+                                @click="showItemShippingDialog($event, order.id, order.user_id, 'b')"
                               >
                                 Item is shipped
                               </v-btn>
+                              <ItemNotAvailable v-model="showItemNotAvailable"/>
                               <v-btn
                                 block
                                 color="primary mt-10"
+                                @click="showItemNotAvailableDialog($event, order.id, order.user_id, 'b')"
                               >
                                 item not available
                               </v-btn>
@@ -80,7 +89,12 @@
                           :key="order.id"
                           >
                           <v-col cols="12" md="3">
-                            <v-img :src="order.product.units[0].photos[0].photo_url" width="200"></v-img>
+                            <div v-if="order.product.units[0].photos[0]">
+                              <v-img :src="order && order.product.units[0].photos[0] ? order.product.units[0].photos[0].photo_url : null" width="200"></v-img>
+                            </div>
+                            <div v-else>
+                              <v-img src="@/assets/no-image.png" width="200" alt="no-image"></v-img>
+                            </div>
                           </v-col>
                           <v-col cols="12" md="3">
                             <v-card-subtitle class="subtitle-2 text-blue font-weight-bold blue--text darken-2 mb-0 pb-0 mt-10">{{order.product.name}}</v-card-subtitle>
@@ -102,21 +116,14 @@
                             <v-card-subtitle class="pb-0 pt-0">{{order.buyer[0].city}} - {{order.buyer[0].zip}}</v-card-subtitle>
                           </v-col>
                             <v-col cols="12" md="3">
-                              <ItemShipping v-model="showItemShipping" :order_id="order.id" :seller_id="order.user.id"/>
+                              <ItemShipping @update_orders="update_orders" v-model="showItemShipping" message_type="o" :user_type="dialog_user_type" :order_id="dialog_order_id" :user_id="dialog_user_id"/>
                               <v-btn
                                 block
                                 color="primary mt-10"
-                                @click.stop="showItemShipping=true"
+                                @click="showItemShippingDialog($event, order.id, order.user_id, 'b')"
                               >
                                 Item is shipped
                               </v-btn>
-                              <v-btn
-                                block
-                                color="primary mt-10"
-                              >
-                                item not available
-                              </v-btn>
-
                               <v-btn
                                 block
                                 color="primary mt-10"
@@ -150,28 +157,94 @@
 import Footer from '@/components/Footer.vue'
 import TopSearchBar from '@/components/TopSearchBar.vue'
 import ItemShipping from '@/components/ItemShipping.vue'
+import ItemNotAvailable from '@/components/ItemNotAvailable.vue'
 
 export default {
     name: 'OrderHistory',
     components: {
         Footer,
         TopSearchBar,
-        ItemShipping
+        ItemShipping,
+        ItemNotAvailable
     },
     data () {
         return {
           showItemShipping: false,
+          showItemNotAvailable: false,
           pending_orders: [],
-          orders: []
+          orders: [],
+          dialog_user_type: null,
+          dialog_order_id: null,
+          dialog_user_id: null,
         }
     }, 
     computed: {
         
     },
     methods: {
-        validate() {
+      update_orders()
+      {
+         this.$store.dispatch('getOrdersBySeller')
+          .then((res) => {
             
-        }
+            this.pending_orders = res.data.data
+            console.log(this.orders)
+            //console.log(res.data.data[0].product.units[0].photos[0])
+
+          })
+        .catch(err => {
+          console.log(err)
+        })
+
+      },
+      showItemNotAvailableDialog(e, order_id, user_id, user_type) {
+        let data = {
+                message_type:'i',
+                message: 'item not available',
+                buyer_id: user_id,
+                order_id: order_id,
+                user_type: user_type
+            }
+            this.$store.dispatch('itemNotAvailable', data)
+            .then((res) => {
+                switch (res.data.status) {
+                    case 2:
+                        this.showItemNotAvailable = true
+                        break;
+                    case 6:
+                        this.sending = false;
+                        this.$swal({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: res.data.message,
+                        });
+                        break;
+                    default:
+                    break;
+                }
+
+                //this.$router.push('/')
+            })
+            .catch(err => {
+                console.log(err)
+                this.sending = false;
+                this.$swal({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: err,
+                });
+            })
+            
+      },
+      validate() {
+          
+      },
+      showItemShippingDialog(e, order_id, user_id, user_type) {
+        this.dialog_user_type = user_type,
+        this.dialog_order_id= order_id,
+        this.dialog_user_id = user_id,
+        this.showItemShipping = true
+      },
     },
     created() {
       this.$store.dispatch('getProfile')
@@ -189,9 +262,7 @@ export default {
 
       this.$store.dispatch('getOrdersBySeller')
         .then((res) => {
-          this.orders = res.data.data
-          console.log(this.orders)
-          //console.log(res.data.data[0].product.units[0].photos[0])
+          this.pending_orders = res.data.data
 
         })
       .catch(err => {
@@ -200,8 +271,7 @@ export default {
 
       this.$store.dispatch('getOrderByStatus')
         .then((res) => {
-          this.pending_orders = res.data.data
-          //console.log(res.data.data[0].product.units[0].photos[0])
+          this.orders = res.data.data
 
         })
       .catch(err => {

@@ -32,7 +32,7 @@
                 <v-card-text>
                   <div class="single-product-content pa-5">
                       <v-row>
-                          <v-col md="6">
+                          <v-col md="6" v-if="images.length > 0">
                             <VueSlickCarousel
                               ref="c1"
                               :infinite = "images.length"
@@ -52,95 +52,98 @@
                               <div v-for="(item,j) in thumbnail_images"
                                 :key="j"><img :src="item.src"></div>
                             </VueSlickCarousel>
-                            </v-col>
-                             <v-col md="6">
-                                <h2>{{name}}</h2><br>
-                                <h4>{{description}}</h4><br>
-                                <v-simple-table>
-                                    <template v-slot:default>
-                                    <thead>
-                                        <tr>
-                                            <th class="text-left" v-if="is_buyer">Available options</th>
-                                            <th v-else>Product</th>
-                                            <th class="text-left">Price</th>
-                                            <th v-if="!is_buyer">Status</th>
-                                            <th class="text-left"  v-if="is_buyer">Order Quantity</th>
-                                            <th v-else>In Stock</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="product in products" :key="product.name">
-                                            <td width="50%" v-if="is_buyer">{{ product.unit }}
-                                                <v-chip
-                                                    class="ma-2"
-                                                    color="green"
-                                                    text-color="white"
-                                                    v-if="product.stock > 0"
-                                                    >
-                                                    Available ({{product.stock}})
-                                                </v-chip>
-                                                <v-chip
-                                                    class="ma-2"
-                                                    color="red"
-                                                    text-color="white"
-                                                    v-else-if="product.stock == 0"
-                                                    >
-                                                    Not available
-                                                    </v-chip>
-                                            </td>
-                                            <td v-else>{{ product.unit }}</td>
-                                            <td width="30%">&#x20B9; {{ product.mrp | formatPrice}}</td>
-                                            <th v-if="!is_buyer">
-                                               <v-chip
-                                                    class="ma-2"
-                                                    color="green"
-                                                    text-color="white"
-                                                    v-if="product.stock > 0"
-                                                    >
-                                                    Available
-                                                </v-chip>
-                                                <v-chip
-                                                    class="ma-2"
-                                                    color="red"
-                                                    text-color="white"
-                                                    v-else-if="product.stock == 0"
-                                                    >
-                                                    Not available
-                                                    </v-chip>
-                                            </th>
-                                            <td width="20%" v-if="is_buyer"><v-text-field
-                                                outlined
-                                                dense
-                                                ref="quantity"
-                                                v-model="product.quantity"
-                                                label="quantity"
-                                                placeholder="quantity"
-                                                @keyup="checkAvailability"
-                                                class="mt-4"
-                                            ></v-text-field></td>
-                                            <td v-else>
-                                              <span v-if="product.stock != null ">{{product.stock}}</span>
-                                              <span v-else>NA</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                     <tfoot>
-                                        <tr>
-                                            <td colspan="3" class="pa-0 ma-0"><v-divider></v-divider></td>
-                                        </tr>
-                                        <tr v-if="is_buyer">
-                                            <th class="text-left"></th>
-                                            <th class="text-left">Total Qauntity</th>
-                                            <th class="text-left">{{totalQuantity}}</th>
-                                        </tr>
-                                        <tr v-if="is_buyer">
-                                          <td colspan="3" class="text-right" @click="confirmOrder"><v-btn class="success">Confirm Order</v-btn></td>
-                                        </tr>
-                                    </tfoot>
-                                    </template>
-                                </v-simple-table>
-                            
-                            </v-col>
+                          </v-col>
+                          <v-col md="6" v-else class="text-center">
+                            <img src="@/assets/no-image.png" alt="">
+                          </v-col>
+                            <v-col md="6">
+                              <h2>{{name}}</h2><br>
+                              <h4>{{description}}</h4><br>
+                              <v-simple-table>
+                                  <template v-slot:default>
+                                  <thead>
+                                      <tr>
+                                          <th class="text-left" v-if="is_buyer">Available options</th>
+                                          <th v-else>Product</th>
+                                          <th class="text-left">Price</th>
+                                          <th v-if="!is_buyer">Status</th>
+                                          <th class="text-left"  v-if="is_buyer">Order Quantity</th>
+                                          <th v-else>In Stock</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <tr v-for="product in products" :key="product.name">
+                                          <td width="50%" v-if="is_buyer">{{ product.unit }}
+                                              <v-chip
+                                                  class="ma-2"
+                                                  color="green"
+                                                  text-color="white"
+                                                  v-if="product.stock > 0"
+                                                  >
+                                                  Available ({{product.stock}})
+                                              </v-chip>
+                                              <v-chip
+                                                  class="ma-2"
+                                                  color="red"
+                                                  text-color="white"
+                                                  v-else-if="product.stock == 0"
+                                                  >
+                                                  Not available
+                                                  </v-chip>
+                                          </td>
+                                          <td v-else>{{ product.unit }}</td>
+                                          <td width="30%">&#x20B9; {{ product.mrp | formatPrice}}</td>
+                                          <th v-if="!is_buyer">
+                                              <v-chip
+                                                  class="ma-2"
+                                                  color="green"
+                                                  text-color="white"
+                                                  v-if="product.stock > 0"
+                                                  >
+                                                  Available
+                                              </v-chip>
+                                              <v-chip
+                                                  class="ma-2"
+                                                  color="red"
+                                                  text-color="white"
+                                                  v-else-if="product.stock == 0"
+                                                  >
+                                                  Not available
+                                                  </v-chip>
+                                          </th>
+                                          <td width="20%" v-if="is_buyer"><v-text-field
+                                              outlined
+                                              dense
+                                              ref="quantity"
+                                              v-model="product.quantity"
+                                              label="quantity"
+                                              placeholder="quantity"
+                                              @keyup="checkAvailability"
+                                              class="mt-4"
+                                          ></v-text-field></td>
+                                          <td v-else>
+                                            <span v-if="product.stock != null ">{{product.stock}}</span>
+                                            <span v-else>NA</span>
+                                          </td>
+                                      </tr>
+                                  </tbody>
+                                    <tfoot>
+                                      <tr>
+                                          <td colspan="3" class="pa-0 ma-0"><v-divider></v-divider></td>
+                                      </tr>
+                                      <tr v-if="is_buyer">
+                                          <th class="text-left"></th>
+                                          <th class="text-left">Total Qauntity</th>
+                                          <th class="text-left">{{totalQuantity}}</th>
+                                      </tr>
+                                      <tr v-if="is_buyer">
+                                        <td colspan="3" class="text-right" @click="confirmOrder"><v-btn class="success">Confirm Order</v-btn></td>
+                                      </tr>
+                                  </tfoot>
+                                  </template>
+                              </v-simple-table>
+                          
+                          </v-col>
                       </v-row>
                   </div>
                 </v-card-text>
@@ -193,7 +196,8 @@ export default {
             user_id: null,
             is_buyer: true,
             p_id: null,
-
+            user_type: null,
+            profile_user_id: null
         }
     }, 
     computed: {
@@ -226,19 +230,20 @@ export default {
       },
       searchProduct(id) 
       {
-        console.log(id)
+        //console.log(id)
         this.getProductDetails(id)
       },
       getProductDetails(id) {
         this.$store.dispatch('getProduct', id)
         .then((res) => {
             if(res.data.data) {
-              console.log(res.data.data)
+              //console.log(res.data.data)
               this.images = []
               this.products = []
               this.thumbnail_images = []
               this.product_id = res.data.data[0].id,
               this.user_id = res.data.data[0].user_id,
+              //console.log(this.user_id)
               this.product_category = res.data.data[0].category,
               this.product_sub_category = res.data.data[0].sub_category,
               this.name = res.data.data[0].name,
@@ -284,15 +289,22 @@ export default {
         //console.log(this.products)
         for(let i = 0; i < this.products.length; i++)
         {
-          if(this.products[i].quantity > 0)
+          if(this.totalQuantity > 0)
           {
-            this.order_details.push({
-              product_id: this.product_id,
-              seller_id: this.user_id,
-              product_unit_id: this.products[i].unit_id,
-              price: this.products[i].mrp,
-              quantity: this.products[i].quantity
-            })
+            if(this.products[i].quantity > 0) 
+            {
+              if(localStorage.getItem('user_account'))
+                this.user_type = localStorage.getItem('user_account')
+              this.order_details.push({
+                user_type:  this.user_type,
+                product_id: this.product_id,
+                seller_id: this.user_id,
+                product_unit_id: this.products[i].unit_id,
+                price: this.products[i].mrp,
+                quantity: this.products[i].quantity
+              })
+            }
+            
           }
           else
           {
@@ -347,7 +359,7 @@ export default {
                 }
               })
           }
-        console.log(this.order_details)
+        //console.log(this.order_details)
       }
     },
     created() {
@@ -355,27 +367,97 @@ export default {
       {
         let arr = []
         arr = this.$route.params.id.split('-');
-        console.log(arr)
+        //console.log(arr)
         this.p_id = arr.pop();
-        this.getProductDetails(this.p_id)
+        //this.getProductDetails(this.p_id)
+        this.$store.dispatch('getProduct', this.p_id)
+        .then((res) => {
+            if(res.data.data) {
+              //console.log(res.data.data)
+              this.images = []
+              this.products = []
+              this.thumbnail_images = []
+              this.product_id = res.data.data[0].id,
+              this.user_id = res.data.data[0].user_id,
+              //console.log(this.user_id)
+              this.product_category = res.data.data[0].category,
+              this.product_sub_category = res.data.data[0].sub_category,
+              this.name = res.data.data[0].name,
+              this.description = res.data.data[0].description,
+              this.tax  = res.data.data[0].tax
+              if(res.data.data[0].tax)
+                this.tax_input = true 
+              for (let i = 0; i < res.data.data[0].photos.length; i++) {
+                  this.images.push({
+                      src: res.data.data[0].photos[i].big_image
+                  }) 
+              }
+              for (let i = 0; i < res.data.data[0].photos.length; i++) {
+                  this.thumbnail_images.push({
+                      src: res.data.data[0].photos[i].thumbnail_image
+                  }) 
+              }
+              //console.log(this.images)
+              // this.thumbnail_images = res.data.data.thumbnail_image
+              // console.log(this.thumbnail_images)
+              for (let i = 0; i < res.data.data[0].units.length; i++) {
+                this.products.push({
+                  unit_id: res.data.data[0].units[i].id,
+                  unit: res.data.data[0].units[i].units,
+                  code: res.data.data[0].units[i].code,
+                  mrp: res.data.data[0].units[i].mrp,
+                  rate: res.data.data[0].units[i].rate,
+                  moq: res.data.data[0].units[i].moq,
+                  available: res.data.data[0].units[i].available,
+                  stock: res.data.data[0].units[i].stock,
+                  quantity: 0
+                })
+              }
+              
+              //alert(this.user_id)
+              this.$store.dispatch('getProfile')
+                .then((response) => {
+                //console.log(res)
+                let user = response.data.data
+                this.user_type = user.user_type
+                this.profile_user_id = user.id
+                //console.log(this.profile_user_id)
+                
+                console.log(this.user_id)
+                console.log(this.profile_user_id)
+                if(this.user_id == this.profile_user_id)
+                {
+                  this.logo = user.logo_url
+                  this.business_name = `Search in ${user.business_name}`
+                  this.is_buyer = false
+                }
+                else
+                {
+                  this.is_buyer = true
+                  this.$store.dispatch('getUser', this.user_id)
+                    .then((response) => {
+                    console.log(response)
+                    let user = response.data.data
+                    this.logo = user.logo_url
+                    this.business_name = `Search in ${user.business_name}`
+                
+                  })
+                  .catch(err => {
+                    console.log(err)
+                  })
+                }
+              })
+              .catch(err => {
+                console.log(err)
+              })
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        })
       }
       
-      this.$store.dispatch('getProfile')
-          .then((response) => {
-          //console.log(res)
-          let user = response.data.data
-          this.logo = user.logo_url
-          this.business_name = `Search in ${user.business_name}`
-          if(user.user_type != 'b')
-          {
-            this.is_buyer = false
-          }
-          //console.log(this.user_type)
       
-      })
-      .catch(err => {
-        console.log(err)
-      })
       this.$store.dispatch('getProducts')
         .then((res_product_list) => {
         this.product_autocomplete = res_product_list.data.data
@@ -386,8 +468,7 @@ export default {
       })
     },
     mounted() {
-        //console.log(this.logo)
-        
+
     }
 }
 </script>

@@ -206,7 +206,13 @@ export default {
                 console.log(res)
                  switch (res.data.status) {
                     case 2:
-                        this.$router.push('/profile')
+                        this.showSignUp = false
+                        this.$swal({
+                            icon: 'success',
+                            title: 'Congrats',
+                            text: 'OTP verified successfully. Please login to continue.',
+                        });
+                        this.$router.push('/')
                         break;
                     case 3:
                         this.verifyOTPStatus = false;

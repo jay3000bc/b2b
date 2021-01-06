@@ -17,9 +17,15 @@
                        </v-col>
                      </v-row>
                     <v-row>
-                      <v-col
-                        v-for="image in images"
-                        :key="image.id"
+                      <CoolLightBox 
+                          :items="items" 
+                          :index="index"
+                          @close="index = null">
+                        </CoolLightBox>
+                        <v-col
+                        v-for="(image, imageIndex) in items"
+                        :key="imageIndex"
+                        @click="index = imageIndex"
                         class="d-flex child-flex"
                         cols="3"
                       >
@@ -39,6 +45,7 @@
                                 <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
                               </v-row>
                             </template>
+                            <v-btn text small @click="deleteGalleryImage(index)" class="float-right"><i class="fa fa-times" aria-hidden="true"></i></v-btn>
                           </v-img>
                         </v-card>
                       </v-col>
@@ -66,12 +73,16 @@ import TopSearchBar from '@/components/TopSearchBar.vue'
 import vueDropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 
+import CoolLightBox from 'vue-cool-lightbox'
+import 'vue-cool-lightbox/dist/vue-cool-lightbox.min.css'
+
 export default {
     name: 'ImageGallery',
     components: {
         Footer,
         TopSearchBar,
-        vueDropzone
+        vueDropzone,
+        CoolLightBox,
     },
     data () {
         return {
@@ -88,69 +99,106 @@ export default {
               uploadMultiple: false
           },
           uploadImages: [],
+          index: null,
+          items: [],
         }
     }, 
     computed: {
         
     },
     methods: {
-        validate() {
-            
-        },
-        afterComplete(file) {
-          this.uploadImages.push(file.dataURL)
-          console.log(this.uploadImages);
-        },
-        saveImages() {
-          let data = {
-            images: this.uploadImages
-          }
-          this.$store.dispatch('saveImages', data)
-          .then((res) => {
-            this.valid = false;
-            console.log(res)
-            let status = res.data.status
-            switch (status) {
-              case 1:
-                this.$swal({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: res.data.message,
-              });
-              break;
-              case 2:
-                this.$swal({
-                  icon: 'success',
-                  title: 'Congrats',
-                  text: 'Images(s) saved successfully',
-              });
-              break;
-              case 3:
-                this.$swal({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: res.data.message,
-              });
-              break;
-              default:
+      deleteGalleryImage(index) {
+        this.$store.dispatch('deleteGalleryImage', index)
+        .then((res) => {
+          switch (res.data.status) {
+                case 2:
+                  this.$swal({
+                      icon: 'success',
+                      title: 'Congrats',
+                      text: 'Image deleted successfully',
+                  });
+                  //this.images.splice(index,1)
+                  this.images = Object.keys(this.images).reduce((object, key) => {
+                    if (key !== index) {
+                      object[key] = this.images[key]
+                    }
+                    return object
+                  }, {})
+                  break;
+                case 4:
+                  this.$swal({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: 'Image not found !',
+                  });
+                  break;
+                default:
                 break;
             }
-          })
-          .catch(err => {
-            // console.log(err)
-            this.$swal({
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      },
+      validate() {
+          
+      },
+      afterComplete(file) {
+        this.uploadImages.push(file.dataURL)
+        console.log(this.uploadImages);
+      },
+      saveImages() {
+        let data = {
+          images: this.uploadImages
+        }
+        this.$store.dispatch('saveImages', data)
+        .then((res) => {
+          this.valid = false;
+          console.log(res)
+          let status = res.data.status
+          switch (status) {
+            case 1:
+              this.$swal({
                 icon: 'error',
                 title: 'Oops...',
-                text: err,
+                text: res.data.message,
             });
-          })
-        },
+            break;
+            case 2:
+              this.$swal({
+                icon: 'success',
+                title: 'Congrats',
+                text: 'Images(s) saved successfully',
+            });
+            break;
+            case 3:
+              this.$swal({
+                icon: 'error',
+                title: 'Oops...',
+                text: res.data.message,
+            });
+            break;
+            default:
+              break;
+          }
+        })
+        .catch(err => {
+          // console.log(err)
+          this.$swal({
+              icon: 'error',
+              title: 'Oops...',
+              text: err,
+          });
+        })
+      },
     },
     created() {
       this.$store.dispatch('getImages')
         .then((res) => {
             this.images = res.data.data.originals
-            //console.log(res.data.data)
+            //console.log(this.images)
+            this.items = Object.values(this.images)
+            //console.log(this.items)
         })
         .catch(err => {
             console.log(err)
@@ -180,7 +228,7 @@ export default {
       font-size: 20px;
     }
     .home h5 {
-      font-size: 10px;;
+      font-size: 10px;
     }
   }
 </style>

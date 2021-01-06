@@ -3,23 +3,15 @@
     <v-main>
       <v-container
       >
-        <top-search-bar :mobile_number="mobile_number" :logo="logo"/>
         <v-row justify="center">
           <v-col cols="12" sm="10" md="8" lg="12">
               <v-card>
-                <v-card-title>Product Details<v-spacer></v-spacer><v-btn>Order Quantity [{{order_quantity}}]</v-btn></v-card-title>
+                <v-card-title>Product Preview<v-spacer></v-spacer><v-btn text small @click.stop="show=false"><i class="fa fa-times" aria-hidden="true"></i></v-btn></v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
                   <div class="single-product-content pa-5">
                       <v-row>
                           <v-col md="4">
-                              <!-- <v-carousel :show-arrows="false">
-                                    <v-carousel-item
-                                    v-for="(item,i) in images"
-                                    :key="i"
-                                    :src="item.src"
-                                    ></v-carousel-item>
-                                </v-carousel> -->
                                <VueSlickCarousel
                                   ref="c1"
                                   :asNavFor="$refs.c2"
@@ -45,7 +37,6 @@
                                         <tr>
                                             <th class="text-left">Available options</th>
                                             <th class="text-left">Price</th>
-                                            <th class="text-left">Order Quantity</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -57,7 +48,7 @@
                                                     text-color="white"
                                                     v-if="product.stock > 0"
                                                     >
-                                                    Available
+                                                    Available ({{product.stock}})
                                                 </v-chip>
                                                 <v-chip
                                                     class="ma-2"
@@ -68,31 +59,9 @@
                                                     Not available
                                                     </v-chip>
                                             </td>
-                                            <td width="30%">Rs. {{ product.mrp }}</td>
-                                            <td width="20%"><v-text-field
-                                                outlined
-                                                dense
-                                                ref="quantity"
-                                                v-model="product.quantity"
-                                                label="quantity"
-                                                placeholder="quantity"
-                                                class="mt-4"
-                                            ></v-text-field></td>
+                                            <td width="30%">&#x20B9; {{ product.mrp | formatPrice }}</td>
                                         </tr>
                                     </tbody>
-                                     <tfoot>
-                                        <tr>
-                                            <td colspan="3" class="pa-0 ma-0"><v-divider></v-divider></td>
-                                        </tr>
-                                        <tr>
-                                            <th class="text-left"></th>
-                                            <th class="text-left">Total Qauntity</th>
-                                            <th class="text-left">{{totalQuantity}}</th>
-                                        </tr>
-                                        <tr>
-                                          <td colspan="3" class="text-right"><v-btn class="success">Confirm Order</v-btn></td>
-                                        </tr>
-                                    </tfoot>
                                     </template>
                                 </v-simple-table>
                             
@@ -102,22 +71,18 @@
                 </v-card-text>
                 <v-divider class="mt-12"></v-divider>
                 <v-card-actions>
-                  <v-btn text>B2B @2020</v-btn>
                   <v-spacer></v-spacer>
-                  <v-btn  color="primary" text>Version 1.0.0</v-btn>
+                   <v-btn text>Close</v-btn>
                 </v-card-actions>
               </v-card>
           </v-col>
         </v-row>
       </v-container>
     </v-main>
-    <Footer/>
   </div>
 </template>
 
 <script>
-import Footer from '@/components/Footer.vue'
-import TopSearchBar from '@/components/TopSearchBar.vue'
 import VueSlickCarousel from 'vue-slick-carousel'
 import 'vue-slick-carousel/dist/vue-slick-carousel.css'
   // optional style for arrows & dots
@@ -126,8 +91,6 @@ import 'vue-slick-carousel/dist/vue-slick-carousel-theme.css'
 export default {
     name: 'SingleProduct',
     components: {
-        Footer,
-        TopSearchBar,
         VueSlickCarousel 
     },
     data () {

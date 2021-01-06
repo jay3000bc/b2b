@@ -15,27 +15,28 @@
                     dense
                     border="left"
                     type="warning"
+                    v-if="newMessageCount"
                   >
-                    You have new message(s). <a href="#">Click Here</a> to view
+                    You have new message(s). <a href="/messages">Click Here</a> to view
                   </v-alert>
                     <v-btn color="purple" dark>Pages views: 22</v-btn>
-                    <v-btn color="primary ml-3" dark>Order Pending: 1</v-btn>
+                    <v-btn color="primary ml-3" dark>Order Pending: {{pending_orders.length}}</v-btn>
                     <h3 class="mt-5">Your recent purchases</h3>
                     <v-simple-table>
                       <template v-slot:default>
                         <thead>
                           <tr>
-                            <th class="text-left text-uppercase font-weight-bold">Customer</th>
+                            <th class="text-left text-uppercase font-weight-bold">Sellers</th>
                             <th class="text-left text-uppercase font-weight-bold">Order date</th>
                             <th class="text-left text-uppercase font-weight-bold">Dispatch Date</th>
                             <th class="text-left text-uppercase font-weight-bold">Status</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="item in desserts" :key="item.name">
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.orderDate }}</td>
-                            <td>{{ item.dispatchDate }}</td>
+                          <tr v-for="item in orders" :key="item.name">
+                            <td>{{ item.seller[0].business_name }}</td>
+                            <td>{{ item.created_at | formatDate }}</td>
+                            <td>{{ item.dispatched_date | formatDate}}</td>
                             <td><span v-if="item.status == 1" class="fa-stack fa-lg"><i class="fa fa-check fa-stack-1x" color="green"></i></span>
                                 <span v-else class="fa-stack fa-lg"><i class="fa fa-times fa-stack-1x" color="red"></i></span>
                             </td>
@@ -72,11 +73,12 @@
                     dense
                     border="left"
                     type="warning"
+                    v-if="newMessageCount"
                   >
-                    You have new message(s). <a href="#">Click Here</a> to view
+                    You have new message(s). <v-btn text to="/messages" color="primary" >Click here</v-btn> to view
                   </v-alert>
                     <v-btn color="purple" dark>Pages views: 22</v-btn>
-                    <v-btn color="primary ml-3" dark>Order Pending: 1</v-btn>
+                    <v-btn color="primary ml-3" :to="order_pending_link" dark>Order Pending: {{pending_orders.length}}</v-btn>
                     <h3 class="mt-5">Your recent Sales</h3>
                     <v-simple-table>
                       <template v-slot:default>
@@ -89,10 +91,10 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="item in desserts" :key="item.name">
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.orderDate }}</td>
-                            <td>{{ item.dispatchDate }}</td>
+                          <tr v-for="item in orders" :key="item.name">
+                            <td>{{ item.user.business_name }}</td>
+                            <td>{{ item.created_at | formatDate }}</td>
+                            <td>{{ item.dispatched_date | formatDate }}</td>
                             <td><span v-if="item.status == 1" class="fa-stack fa-lg"><i class="fa fa-check fa-stack-1x" color="green"></i></span>
                                 <span v-else class="fa-stack fa-lg"><i class="fa fa-times fa-stack-1x" color="red"></i></span>
                             </td>
@@ -108,7 +110,7 @@
                         :key="buyer.id"
                         cols="3"
                         >
-                        <v-card class="mb-5 mr-2" link>
+                        <v-card class="mb-5 mr-2" link @click="buyer_details_page(buyer.id)">
                             <v-img
                             :src="buyer.logo_url"
                             class="white--text align-end"
@@ -127,21 +129,9 @@
                         max-width="344"
                         outlined
                       >
+                        <v-card-text>There is some technical issue issue.</v-card-text>
                         <v-card-actions>
-                          <v-btn
-                            outlined
-                            rounded
-                            text
-                          >
-                            View as Seller
-                          </v-btn>
-                          <v-btn
-                            outlined
-                            rounded
-                            text
-                          >
-                            View as Buyer
-                          </v-btn>
+                          <v-btn class="text-center" @click="logout">Please login again</v-btn>
                         </v-card-actions>
                       </v-card>
                     </div>
@@ -173,34 +163,26 @@ export default {
     },
     data () {
         return {
-            mobile_number: null,
-            logo: null,
-            valid:true,
-            buyer: false,
-            seller:false,
-            buyer_seller: false,
-            desserts: [
-            {
-              name: 'Sunil Traders',
-              orderDate: '21/01/2020',
-              dispatchDate: '25/01/2020',
-              status: '1',
-            },
-            {
-              name: 'National Traders',
-              orderDate: '21/01/2020',
-              dispatchDate: '25/01/2020',
-              status: '0',
-            }
-          ],
+          orders: null,
+          newMessageCount: null,
+          valid:true,
+          buyer: false,
+          seller:false,
+          buyer_seller: false,
+          user_type: null,
           sellers: [],
           buyers: [],
+          order_pending_link: '/orders',
+          pending_orders: null,
         }
     }, 
     computed: {
         
     },
     methods: {
+      buyer_details_page(id) {
+        this.$router.push('/buyer-details/'+id)
+      },
       shop_page(id) {
         this.$router.push('/my-shop/'+id)
       },
@@ -211,28 +193,84 @@ export default {
         if(localStorage.getItem('user_account') == 'b') {
           this.buyer = true
           this.seller = false
+          this.order_pending_link = '/my-orders'
         }
         else if(localStorage.getItem('user_account') == 's') {
           this.seller = true
           this.buyer = false
+          this.order_pending_link = '/orders'
         }
+        this.user_type = localStorage.getItem('user_account')
+        this.getMessageCount()
+        this.getOrderByUserType()
+      },
+      getMessageCount()
+      {
+        this.$store.dispatch('getNewMessagesCount', this.user_type)
+        .then((res) => {
+            //console.log(res.data.data)
+            this.newMessageCount = res.data.data
+        
+        })
+        .catch(err => {
+            console.log(err)
+        })
+      },
+      getOrderByUserType()
+      {
+        this.$store.dispatch('getOrdersByUserType', this.user_type)
+            .then((res) => {
+              this.orders = res.data.data
+              console.log(this.orders)
+            })
+          .catch(err => {
+            console.log(err)
+          })
+      },
+      logout() {
+        this.$store.dispatch('logout')
+            .then(() => {
+            this.$router.push('/')    
+            })
+            .catch(err => {
+                console.log(err)
+        })
       },
     },
     created() {
+      this.$store.dispatch('getOrdersBySeller')
+        .then((res) => {
+          this.pending_orders = res.data.data
+      })
+      .catch(err => {
+        console.log(err)
+      })
       this.$store.dispatch('getProfile')
           .then((res) => {
-          console.log(res.data.data)
+          //console.log(res.data.data)
           let user = res.data.data
+          this.user_type = user.user_type
+          console.log(this.user_type)
+          if(localStorage.getItem('user_account') != null)
+            this.user_type = localStorage.getItem('user_account')
           if(user.user_type == 'b')
+          {
             this.buyer = true
+            localStorage.setItem('user_account', 'b')
+          }
           if(user.user_type == 's')
+          {
             this.seller = true
+            localStorage.setItem('user_account', 's')
+          }
           if(user.user_type == 'bs')
+          {
             this.buyer_seller = true
+          }
           //console.log(localStorage.getItem('user_account'))
           if(user.user_type == 'bs' &&  localStorage.getItem('user_account') == null)
           {
-            console.log('hello')
+            //console.log('hello')
             this.$router.push('/view-as-seller-buyer')
           }
           if(localStorage.getItem('user_account') == 'b') {
@@ -241,6 +279,8 @@ export default {
           else if(localStorage.getItem('user_account') == 's') {
             this.seller = true
           }
+          this.getMessageCount()
+          this.getOrderByUserType()
       })
       .catch(err => {
         console.log(err)

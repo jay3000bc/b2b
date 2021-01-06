@@ -25,6 +25,7 @@
                                         <th class="text-left">NAME</th>
                                         <th class="text-left">PRICE</th>
                                         <th class="text-left">IMAGE</th>
+                                        <th class="text-left">STOCK</th>
                                         <th class="text-left">AVAILABILITY</th>
                                         <th class="text-left">STATUS</th>
                                         <th class="text-left">ACTION</th>
@@ -37,17 +38,21 @@
                                         <td>
                                           {{ item.rate }}
                                         </td>
-                                        <td>
+                                        <td v-if="item.thumbnail_image.length > 0 ">
                                             <span class="mr-2"  v-for="photo in item.thumbnail_image" :key="photo">
-                                                <img width="50" height="50" :src="photo" :alt="photo">
+                                                <img width="50" height="50" :src="photo" alt="no-image">
                                             </span>
                                         </td>
-                                         <td>
+                                        <td v-else>
+                                            <img src="@/assets/no-image.png" width="40" alt="">
+                                        </td>
+                                        <td>{{item.stock}}</td>
+                                        <td>
                                              <v-select 
                                                 style="width: 100px;"
                                                 :items="options_yes_no"
                                                 label="Select"
-                                                :value="item.available"
+                                                :value="(item.stock > 0) ? 'yes' : 'no'"
                                                 @change="change_available($event, item.unit_id)"
                                                 dense
                                                 solo
@@ -66,7 +71,7 @@
                                                 class="mt-2"
                                                 ></v-select>
                                         </td>
-                                        <td><v-btn :to="{ name: 'SingleProduct', params: { id: item.slug }}" small class="mr-2">View</v-btn><v-btn small :to="{ name: 'AddProduct', params: { id: item.id }}">Edit</v-btn></td>
+                                        <td width="300"><v-btn :to="{ name: 'SingleProduct', params: { id: item.slug }}"  class="mr-2"><span class="mdi mdi-eye"></span></v-btn><v-btn  :to="{ name: 'AddProduct', params: { id: item.id }}"><span class="mdi mdi-tooltip-edit"></span></v-btn><v-btn class="ml-2"  @click="delete_product(item.id)"><span class="mdi mdi-delete"></span></v-btn></td>
                                     </tr>
                                 </tbody>
                             </template>
@@ -165,6 +170,66 @@ export default {
               text: err,
           });
         })
+      },
+      delete_product(id)
+      {
+        console.log(id)
+        this.$swal({
+          title: 'Are you sure?',
+          text: 'Once deleted, you will not be able to recover this product!',
+          icon: 'warning',
+          showCancelButton: true,
+            confirmButtonText: 'Yes Delete it!',
+            cancelButtonText: 'No, Keep it!',
+            showCloseButton: true,
+          }).then((result) => {
+            if(result.value) 
+            {
+              //this.$swal('Deleted', 'You successfully deleted this file', 'success')
+              this.$store.dispatch('deleteProduct', id)
+                .then((res) => {
+                switch (res.data.status) {
+                    case 2:
+                        this.$swal({
+                            icon: 'success',
+                            title: 'Congrats',
+                            text: 'Product deleted successfully',
+                        });
+                        var removeIndex = this.products.map(function(item) { return item.id; }).indexOf(id);
+                        this.products.splice(removeIndex, 1);
+                        break;
+                    case 4:
+                        this.$swal({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: res.data.message,
+                        });
+                        break;
+                    case 6:
+                        this.$swal({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong !',
+                        });
+                        break;
+                    default:
+                    break;
+                }
+                })
+                .catch(err => {
+                // console.log(err)
+                this.$swal({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: err,
+                });
+            })
+            } 
+            else 
+            {
+              this.$swal('Cancelled', 'Your Order is still intact', 'info')
+            }
+          })
       },
     },
     created() {

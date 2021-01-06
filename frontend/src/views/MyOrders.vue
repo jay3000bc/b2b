@@ -21,7 +21,11 @@
                   :key="order.id"
                   >
                    <v-col cols="12" md="3">
-                     <v-btn id="no-background-hover" :ripple="false" class="mt-15" text :to="{ name: 'SingleProduct', params: { id: order.product.name.replace(' ', '-').toLowerCase() +'-'+order.product.id }}"><v-img :src="order.product.units[0].photos[0].photo_url" width="200"></v-img></v-btn>
+                     <v-btn id="no-background-hover" :ripple="false" class="mt-15" text :to="{ name: 'SingleProduct', params: { id: order.product.name.replace(' ', '-').toLowerCase() +'-'+order.product.id }}">
+                        <div v-if="order.product.units[0].photos">
+                          <v-img :src="order && order.product.units[0].photos[0] ? order.product.units[0].photos[0].photo_url : null" width="200"></v-img>
+                        </div>
+                      </v-btn>
                    </v-col>
                    <v-col cols="12" md="3">
                     <v-card-subtitle class="subtitle-2 text-blue font-weight-bold blue--text darken-2 mb-0 pb-0 mt-10">{{order.product.name}}</v-card-subtitle>
@@ -30,7 +34,7 @@
                    </v-col>
                    <v-col cols="12" md="3">
                      <v-card-subtitle class="font-weight-black mt-10 mb-0 pb-0">
-                       Supplier: {{order.user.business_name}}
+                       Supplier: {{order.seller[0].business_name}}
                     </v-card-subtitle>
                     <v-card-subtitle class="font-weight-medium mb-0 pb-0">
                       Order date: {{ order.created_at | formatDate}}
@@ -47,11 +51,11 @@
                       >
                         Delete
                       </v-btn>
-                      <sendMessage v-model="showSendMessage" :order_id="order.id" :seller_id="order.user.id"/>
+                      <sendMessage v-model="showSendMessage" message_type="i" :user_type="dialog_user_type" :order_id="dialog_order_id" :seller_id="dialog_seller_id"/>
                       <v-btn
                         block
                         color="success mt-10"
-                         @click.stop="showSendMessage=true"
+                         @click="showSendMessageDialog($event, order.id, order.seller_id, 's')"
                       >
                         Message 
                       </v-btn>
@@ -95,6 +99,9 @@ export default {
     },
     data () {
       return {
+        dialog_user_type: null,
+        dialog_order_id: null,
+        dialog_seller_id: null,
         showChangeShippingAddress: false,
         showSendMessage: false,
         orders: [],
@@ -109,6 +116,13 @@ export default {
         
     },
     methods: {
+      showSendMessageDialog(e, order_id, seller_id, user_type) {
+        this.dialog_user_type = user_type,
+        this.dialog_order_id= order_id,
+        this.dialog_seller_id = seller_id,
+        //console.log(seller_id+user_type+seller_id)
+        this.showSendMessage = true
+      },
       change_state() {
         //console.log(this.state)
         if(this.state != null)
@@ -313,7 +327,7 @@ export default {
       this.$store.dispatch('getOrders')
           .then((res) => {
             this.orders = res.data.data
-            console.log(res.data.data[0].product.units[0].photos[0])
+            //console.log(res.data.data[0].product.units[0].photos[0])
 
         })
       .catch(err => {

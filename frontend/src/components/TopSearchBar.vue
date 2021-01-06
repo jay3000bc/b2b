@@ -40,10 +40,10 @@
                     <v-btn to="/change-password" class="text-center"><v-list-item-title>Change Password</v-list-item-title></v-btn>
                     <v-btn class="text-center" to="/suppliers"><v-list-item-title>Suppliers</v-list-item-title></v-btn>
                     <v-btn to="/my-orders" class="text-center"><v-list-item-title>My Orders</v-list-item-title></v-btn>
-                    <v-btn  to="/become-seller" class="text-center" v-if="db_user_type==='b'"><v-list-item-title >Became a Seller</v-list-item-title></v-btn>
+                    <v-btn to="/become-seller" class="text-center" v-if="db_user_type==='b'"><v-list-item-title >Became a Seller</v-list-item-title></v-btn>
                     <v-btn v-else-if="db_user_type==='bs'" @click="viewAsSeller"><v-list-item-title>Switch to Seller</v-list-item-title></v-btn>
                     <v-btn to="/help-support" class="text-center"><v-list-item-title>Help &amp; Support</v-list-item-title></v-btn>
-                    <v-btn><v-list-item-title @click="logout" >Logout</v-list-item-title></v-btn>
+                    <v-btn><v-list-item-title @click="logout">Logout</v-list-item-title></v-btn>
                 </v-list-item-content>
                 <v-list-item-content v-else-if="user_type1==='bs'">
                     <v-btn @click="viewAsBuyer"  class="text-center"><v-list-item-title >View as Buyer</v-list-item-title></v-btn>

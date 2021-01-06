@@ -146,7 +146,8 @@
                 </v-card-text>
                 <v-divider class="mt-12"></v-divider>
                 <v-card-actions>
-                  <v-btn   v-show="save_btn" text @click="previewProduct">Preview</v-btn>
+                  <ProductPreview v-model="showPreviewProduct"/>
+                  <v-btn text small color="primary" @click="previewProduct">Preview</v-btn>
                   <v-spacer></v-spacer>
                   <v-btn  color="primary" v-show="save_btn" text :disabled="!valid"  @click="validate">Save</v-btn>
                   <v-btn  color="primary" v-show="update_btn" text :disabled="!valid"  @click="validate">Update</v-btn>
@@ -163,6 +164,7 @@
 
 <script>
 import Footer from '@/components/Footer.vue'
+import ProductPreview from '@/components/ProductPreview.vue'
 import TopSearchBar from '@/components/TopSearchBar.vue'
 import vueDropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
@@ -170,6 +172,7 @@ import ImageGallery from '@/components/ImageGallery.vue'
 export default {
     name: 'AddProduct',
     components: {
+        ProductPreview,
         Footer,
         TopSearchBar,
         vueDropzone,
@@ -177,6 +180,7 @@ export default {
     },
     data () {
       return {
+        showPreviewProduct: false,
         selected_images : [],
         business_name: null,
         unit_inputbox_length: 2,
@@ -257,11 +261,7 @@ export default {
           }
           this.$store.dispatch('previewProduct', data)
           .then(() => {
-            //this.valid = false;
-            //console.log(res.data.data.id)
-            window.open('/preview/1', '_blank');
-            //this.$router.push('/preview/'+ res.data.data.id)
-            
+            this.showPreviewProduct = true
           })
           .catch(err => {
             // console.log(err)

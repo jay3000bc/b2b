@@ -22,6 +22,7 @@ import MyOrders from '../views/MyOrders.vue'
 import Orders from '../views/Orders.vue'
 import Messages from '../views/Messages.vue'
 import ViewAsSellerBuyer from '../views/ViewAsSellerBuyer.vue'
+import BuyerDetails from '../views/BuyerDetails.vue'
 
 
 
@@ -215,14 +216,22 @@ Vue.use(VueRouter)
       requiresAuth: true
     },
   },
+  {
+    path: '/buyer-details/:id',
+    name: 'BuyerDetails',
+    component: BuyerDetails,
+    meta: { 
+      requiresAuth: true
+    },
+  },
 
 ]
 
 const router = new VueRouter({
   mode: 'history',
   //mode: '#',
-  //base: process.env.BASE_URL,
-  base: '/mukesh/b2b/',
+  base: process.env.BASE_URL,
+  //base: '/mukesh/b2b/',
   routes
 })
 

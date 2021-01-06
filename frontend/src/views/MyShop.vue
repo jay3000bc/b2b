@@ -39,7 +39,7 @@
                             height="200px"
                             >
                             </v-img>
-                            <v-card-title style="white-space:nowrap" v-text="product.name" class="justify-center ml-0 py-0 pt-2 mb-2 subtitle-2"></v-card-title>
+                            <v-card-title style="white-space:nowrap" v-text="product.name.length < 20  ? product.name : product.name.slice(0,20)" class="justify-center ml-0 py-0 pt-2 mb-2 subtitle-2"></v-card-title>
                             <v-card-actions class="justify-center pt-0 pb-6">
                                 <v-btn small class="success" :to="{ name: 'SingleProduct', params: { id: product.name.replace(' ', '-').toLowerCase() +'-'+ product.id }}"> View Options</v-btn>
                             </v-card-actions>

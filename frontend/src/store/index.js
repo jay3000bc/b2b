@@ -88,11 +88,11 @@ export default new Vuex.Store({
         axios({url: `${process.env.VUE_APP_APIURL}verifyotp`, data: user, method: 'POST' })
         .then(resp => {
           console.log(resp)
-          const token = resp.data.token
-          const user = resp.data.user
-          localStorage.setItem('token', token)
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-          commit('auth_success', token, user)
+          // const token = resp.data.token
+          // const user = resp.data.user
+          // localStorage.setItem('token', token)
+          // axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+          // commit('auth_success', token, user)
           resolve(resp)
         })
         .catch(err => {
@@ -715,6 +715,146 @@ export default new Vuex.Store({
         axios({url: `${process.env.VUE_APP_APIURL}users/${id}`, method: 'GET' })
         .then(resp => {
           console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    deleteGalleryImage({commit}, id) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}deleteGalleryImage/${id}`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getNewMessagesCount({commit}, user_type) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getNewMessagesCount/${user_type}`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getOrdersByUserType({commit}, user_type) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getOrdersByUserType/${user_type}`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    changeMobileNumber({commit}, mobile_number) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}changeMobileNumber/${mobile_number}`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    addNewMobileNumber({commit}, data) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}addNewMobileNumber`, data: data, method: 'POST' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    deleteMobileNumber({commit}, data) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}deleteMobileNumber`, data:data,  method: 'POST' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getSentMessages({commit}, user_type) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getSentMessages/${user_type}`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    getInboxMessages({commit}, user_type) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}getInboxMessages/${user_type}`, method: 'GET' })
+        .then(resp => {
+          console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    deleteProduct({commit}, id) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}deleteProduct/${id}`,  method: 'GET' })
+        .then(resp => {
+          //console.log(resp)
+          resolve(resp)
+        })
+        .catch(err => {
+          commit('auth_error', err)
+          reject(err)
+        })
+      })
+    },
+    itemNotAvailable({commit}, data) {
+      return new Promise((resolve, reject) => {
+        commit('auth_request')
+        axios({url: `${process.env.VUE_APP_APIURL}itemNotAvailable`, data: data, method: 'POST' })
+        .then(resp => {
+          //console.log(resp)
           resolve(resp)
         })
         .catch(err => {
